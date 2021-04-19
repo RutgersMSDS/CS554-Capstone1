@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bioada</title>
+    <!-- <link href="../bootstrap/css/bootstrap.css" rel="stylesheet"> -->
+    <link href="static/boxicons/css/boxicons.min.css" rel="stylesheet"> 
+    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+	<script src="static/jquery/jquery.min.js"></script>
+    <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		
+	<script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+	<script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
+	<script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+
+    <link href="static/Custom.css" rel="stylesheet">
+	<style>
+		.tab {
+		  overflow: hidden;
+		  border: 1px solid #ccc;
+		  background-color: #f1f1f1;
+		}
+
+		.tab button {
+		  background-color: inherit;
+		  float: left;
+		  border: none;
+		  outline: none;
+		  cursor: pointer;
+		  padding: 14px 16px;
+		  transition: 0.3s;
+		  font-size: 17px;
+		}
+
+		.tab button:hover {
+		  background-color: #ddd;
+		}
+
+		.tab button.active {
+		  background-color: #ccc;
+		}
+
+		.tabcontent {
+		  display: none;
+		  padding: 6px 12px;
+		  border: 1px solid #ccc;
+		  border-top: none;
+		}
+		.checkmark {
+			display:inline-block;
+			width: 22px;
+			height:22px;
+			-ms-transform: rotate(45deg); /* IE 9 */
+			-webkit-transform: rotate(45deg); /* Chrome, Safari, Opera */
+			transform: rotate(45deg);
+		}
+		.amcharts-g3 {
+		  stroke-linejoin: round;
+		  stroke-linecap: round;
+		  stroke-dasharray: 500%;
+		  stroke-dasharray: 0 /;    /* fixes IE prob */
+		  stroke-dashoffset: 0 /;   /* fixes IE prob */
+		  -webkit-animation: am-draw 20s;
+		  animation: am-draw 20s;
+		}
+		@-webkit-keyframes am-draw {
+			0% {
+				stroke-dashoffset: 500%;
+			}
+			100% {
+				stroke-dashoffset: 0%;
+			}
+		}
+		.checkmark_circle {
+			position: absolute;
+			width:22px;
+			height:22px;
+			margin-top : 5px;
+			background-color: green;
+			border-radius:11px;
+			left:0;
+			top:0;
+		}
+
+		.checkmark_stem {
+			position: absolute;
+			width:3px;
+			height:9px;
+			margin-top : 5px;
+			background-color:#fff;
+			left:11px;
+			top:6px;
+		}
+
+		.checkmark_kick {
+			position: absolute;
+			width:3px;
+			height:3px;
+			margin-top : 5px;
+			background-color:#fff;
+			left:8px;
+			top:12px;
+		}
+		
+		.data-exploration-elements {
+			padding-top: 15px;
+			padding-left: 20px
+		}
+		
+		.fact-table-spacing{
+			margin-left: 10px
+		}
+		
+		#chartdiv {
+		  width: 100%;
+		  height: 430px;
+		}
+	</style>
+	<script type="text/javascript">
+		var data = JSON.parse('{{res|safe}}');
+		
+		function plot_chart(type){
+			var isXChecked = document.getElementById("check_X").checked;
+			var isYChecked = document.getElementById("check_Y").checked;
+			
+			var columns = [];
+			var tableName = document.getElementById("fact_tables_dropdown").value;
+			
+			if(isXChecked){
+				var curr = {};
+				curr["columnName"] = document.getElementById("var_X_values").value;
+				
+				if(document.getElementById("cat_X").checked){
+					curr["columnType"] = "categorical";
+				}else{
+					curr["columnType"] = "numerical";
+				}
+				columns.push(curr);
+			}
+			
+			if(isYChecked){
+				var curr = {};
+				curr["columnName"] = document.getElementById("var_Y_values").value;
+				
+				if(document.getElementById("cat_Y").checked){
+					curr["columnType"] = "categorical";
+				}else{
+					curr["columnType"] = "numerical";
+				}
+				columns.push(curr);
+			}
+			
+			var analysisType = "univariate";
+			
+			if(columns.length == 0){
+				showAlert("Select atleast one variable for analysis!");
+				return;
+			}
+			
+			if(columns.length == 2){
+				analysisType = "bivariate";
+			}
+			
+			var res = {
+				"tableName" : tableName,
+				"columns" : columns,
+				"analysis" : analysisType,
+				"chartType" : type
+			};
+
+			var SERVER_URL = "http://localhost:8000/";
+			var REST_API = SERVER_URL + "getPlotData";
+			
+			var xhttp = new XMLHttpRequest();
+			var token = '{{csrf_token}}';
+			xhttp.open("POST", REST_API, true);
+			xhttp.setRequestHeader("Content-Type", "application/json");
+			xhttp.setRequestHeader("X-CSRFToken", token);
+			
+			xhttp.onload = function (e)
+			{
+				if (xhttp.readyState === 4)
+				{
+					if (xhttp.status === 200)
+					{
+						var chartDiv = document.getElementById("chartdiv");
+						chartDiv.innerHTML = "";
+						var data = JSON.parse(xhttp.responseText);
+
+						if(analysisType == "univariate" && type == "bar" && columns[0]["columnType"] == "categorical"){
+							renderAMCharts("univariate_bar", data);
+						}else if(analysisType == "univariate" && type == "pie" && columns[0]["columnType"] == "categorical"){
+							renderAMCharts("univariate_pie", data);
+						}else if(analysisType == "univariate" && type == "bar" && columns[0]["columnType"] == "numerical"){
+							renderAMCharts("univariate_bar_box", data);
+						}else if(analysisType == "bivariate" && type == "bar" && (columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "numerical") ){
+							renderAMCharts("bivariate_bar_scatter", data["data"][0]);
+						}else if(analysisType == "bivariate" && type == "pie" && (columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "numerical") ){
+							renderAMCharts("bivariate_pie_box", data["data"][1]);
+						}else if(analysisType == "bivariate" && type == "bar" && (columns[0]["columnType"] == "categorical" && columns[1]["columnType"] == "categorical") ){
+							renderAMCharts("bivariate_bar_segment", data["bar"]);
+						}else if(analysisType == "bivariate" && type == "pie" && (columns[0]["columnType"] == "categorical" && columns[1]["columnType"] == "categorical") ){
+							renderAMCharts("bivariate_pie_segment", data["pie"]);
+						}else if(analysisType == "bivariate" && type == "bar" && ((columns[0]["columnType"] == "categorical" && columns[1]["columnType"] == "numerical")||(columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "categorical")) ){
+							renderAMCharts("bivariate_bar_pareto", data["bar"]);
+						}else if(analysisType == "bivariate" && type == "pie" && ((columns[0]["columnType"] == "categorical" && columns[1]["columnType"] == "numerical")||(columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "categorical")) ){
+							renderAMCharts("bivariate_pie_interval", data["pie"]);
+						}
+						
+						displayStatTable(analysisType, data, columns);
+					}else{
+						alert("Error Occured! Check logs");
+						console.error("Server error: ", xhttp.statusText);
+					}
+				}
+			};
+			xhttp.onerror = function (e)
+			{
+				console.error("Error connecting to: ", SERVER_URL);
+			};
+			
+			xhttp.send(JSON.stringify(res));
+		}
+		
+		function displayStatTable(analysisType, data, columns){
+			var statTable = document.getElementById("stats_table");
+			statTable.innerHTML = "";
+			
+			var resTable = document.createElement("table");
+			resTable.style.border = "1px solid #000";
+			resTable.style.width = "inherit";
+			
+			if(analysisType == "univariate"){
+				if(columns[0]["columnType"] == "numerical"){
+					var cols = [];
+					var singleRow = [];
+					
+					var colRow = document.createElement("tr");
+					colRow.style.border = "1px solid #000"
+					
+					var dataRow = document.createElement("tr");
+					dataRow.style.border = "1px solid #000"
+					
+					for(var x in data["data"][0]){
+						var colCell = document.createElement("td");
+						colCell.style.border = "1px solid #000"
+						colCell.style.textAlign = "center";
+						
+						var dataCell = document.createElement("td");
+						dataCell.style.border = "1px solid #000"
+						dataCell.style.textAlign = "center";
+						
+						colCell.innerHTML = x;
+						dataCell.innerHTML = data["data"][0][x];
+						
+						colRow.appendChild(colCell);
+						dataRow.appendChild(dataCell);
+					}
+					
+					resTable.appendChild(colRow);
+					resTable.appendChild(dataRow);
+					
+					statTable.appendChild(resTable);
+				}
+			}
+		}
+		
+		
+		function renderAMCharts(graphType, data){
+			if(graphType == "univariate_bar"){
+				am4core.ready(function() {
+					am4core.useTheme(am4themes_animated);
+					var chart = am4core.create("chartdiv", am4charts.XYChart);
+
+					chart.data = data["data"];
+
+					var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+					categoryAxis.dataFields.category = data["x_axis"];
+					categoryAxis.renderer.grid.template.location = 0;
+					categoryAxis.renderer.minGridDistance = 30;
+					
+					var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+					valueAxis.min = 0;
+
+					var series = chart.series.push(new am4charts.ColumnSeries());
+					series.dataFields.valueY = data["y_axis"];
+					series.dataFields.categoryX = data["x_axis"];
+					series.name = data["y_axis"];
+					
+					series.columns.template.tooltipText = "{categoryX}: [bold]{valueY}[/]";
+					series.columns.template.fillOpacity = .8;
+					series.columns.template.width = am4core.percent(40);
+					
+					let valueLabel = series.bullets.push(new am4charts.LabelBullet());
+					//valueLabel.label.text = "{categoryX}: [bold]{valueY}[/]";
+					valueLabel.label.fontSize = 20;
+					valueLabel.label.dy = -20;
+
+					var columnTemplate = series.columns.template;
+					columnTemplate.strokeWidth = 2;
+					columnTemplate.strokeOpacity = 1;
+				});
+			}else if(graphType == "univariate_pie"){
+				am4core.ready(function() {
+					am4core.useTheme(am4themes_animated);
+
+					var chart = am4core.create("chartdiv", am4charts.PieChart3D);
+					chart.hiddenState.properties.opacity = 0;
+					
+					chart.legend = new am4charts.Legend();
+
+					chart.data = data["data"];
+					chart.innerRadius = 100;
+
+					var series = chart.series.push(new am4charts.PieSeries3D());
+					series.dataFields.value = data["y_axis"];
+					series.dataFields.category = data["x_axis"];
+				});
+			}else if(graphType == "univariate_bar_box"){
+				am4core.ready(function() {
+					manipulated_data = [{
+							"x_axis" : "Random",
+							"x_axis" : data["x_axis"],
+							"Q1" : data["data"][0]["Q1"],
+							"Q3" : data["data"][0]["Q3"],
+							"Median" : data["data"][0]["Median"],
+							"Min" : data["data"][0]["Min"],
+							"Max" : data["data"][0]["Max"]
+					}];
+					
+					am4core.useTheme(am4themes_animated);
+
+					var chart = am4core.create("chartdiv", am4charts.XYChart);
+					chart.paddingRight = 20;
+					chart.data = manipulated_data;
+					
+					var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+					categoryAxis.dataFields.category = "x_axis";
+					categoryAxis.renderer.minGridDistance = 40;
+					categoryAxis.renderer.grid.template.location = 0;
+
+					var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+					valueAxis.tooltip.disabled = true;
+
+					var series = chart.series.push(new am4charts.CandlestickSeries());
+					series.dataFields.categoryX = "x_axis";
+					series.dataFields.valueY = "Q3";
+					series.dataFields.openValueY = "Q1";
+					series.dataFields.lowValueY = "Min";
+					series.dataFields.highValueY = "Max";
+					var median = manipulated_data[0]["Median"].toString();
+					series.simplifiedProcessing = true;
+					series.tooltipText = "Q1:{openValueY.value}\nMin:{lowValueY.value}\nMax:{highValueY.value}\nMedian:" + median + "\nQ3:{valueY.value}";
+
+					chart.cursor = new am4charts.XYCursor();
+
+					var medianaSeries = chart.series.push(new am4charts.StepLineSeries());
+					medianaSeries.noRisers = true;
+					medianaSeries.startLocation = 0.1;
+					medianaSeries.endLocation = 0.9;
+					medianaSeries.dataFields.valueY = "Median";
+					medianaSeries.dataFields.categoryX = "x_axis";
+					medianaSeries.strokeWidth = 2;
+					medianaSeries.stroke = am4core.color("#fff");
+
+					var topSeries = chart.series.push(new am4charts.StepLineSeries());
+					topSeries.noRisers = true;
+					topSeries.startLocation = 0.2;
+					topSeries.endLocation = 0.8;
+					topSeries.dataFields.valueY = "Max";
+					topSeries.dataFields.categoryX = "x_axis";
+					topSeries.stroke = chart.colors.getIndex(0);
+					topSeries.strokeWidth = 2;
+
+					var bottomSeries = chart.series.push(new am4charts.StepLineSeries());
+					bottomSeries.noRisers = true;
+					bottomSeries.startLocation = 0.2;
+					bottomSeries.endLocation = 0.8;
+					bottomSeries.dataFields.valueY = "Min";
+					bottomSeries.dataFields.categoryX = "x_axis";
+					bottomSeries.stroke = chart.colors.getIndex(0);
+					bottomSeries.strokeWidth = 2;
+
+					chart.scrollbarX = new am4core.Scrollbar();
+				});
+			}else if(graphType == "bivariate_bar_scatter"){
+			am4core.ready(function() {
+			am4core.useTheme(am4themes_animated);
+			
+			var chart = am4core.create("chartdiv", am4charts.XYChart);
+			chart.colors.step = 3;
+			chart.data = data["data"];
+			console.log(chart.data)
+			var xAxis = chart.xAxes.push(new am4charts.ValueAxis());
+			xAxis.renderer.minGridDistance = 50;
+
+			var yAxis = chart.yAxes.push(new am4charts.ValueAxis());
+			yAxis.renderer.minGridDistance = 50;
+
+			var series = chart.series.push(new am4charts.LineSeries());
+			series.dataFields.valueY = data["y_axis"];
+			series.dataFields.valueX = data["x_axis"];
+			series.strokeOpacity = 0;
+			series.name = "Series 1";
+
+			var bullet = series.bullets.push(new am4charts.CircleBullet());
+			bullet.strokeOpacity = 0.2;
+			bullet.stroke = am4core.color("#ffffff");
+			bullet.nonScalingStroke = true;
+			bullet.tooltipText = data["x_axis"]+":{valueX}"+ data["y_axis"]+":{valueY}";
+			series.heatRules.push({
+			  target: bullet.circle
+			  });
+			chart.scrollbarX = new am4core.Scrollbar();
+			chart.scrollbarY = new am4core.Scrollbar();
+
+			chart.legend = new am4charts.Legend();
+
+			});
+			
+			}else if(graphType == "bivariate_pie_box"){
+				am4core.ready(function() {
+					manipulated_data = data["data"];
+					
+					am4core.useTheme(am4themes_animated);
+
+					var chart = am4core.create("chartdiv", am4charts.XYChart);
+					chart.paddingRight = 20;
+					chart.data = manipulated_data;
+					
+					var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+					categoryAxis.dataFields.category = "name";
+					categoryAxis.renderer.minGridDistance = 40;
+					categoryAxis.renderer.grid.template.location = 0;
+
+					var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+					valueAxis.tooltip.disabled = true;
+
+					var series = chart.series.push(new am4charts.CandlestickSeries());
+					series.dataFields.categoryX = "name";
+					series.dataFields.valueY = "Q3";
+					series.dataFields.openValueY = "Q1";
+					series.dataFields.lowValueY = "Min";
+					series.dataFields.highValueY = "Max";
+					var median = "TODO";
+					series.simplifiedProcessing = true;
+					series.tooltipText = "Min:{lowValueY.value}\nMax:{highValueY.value}\nQ1:{openValueY.value}\nMedian:" + median+"\nQ3:{valueY.value}";
+
+					chart.cursor = new am4charts.XYCursor();
+
+					var medianaSeries = chart.series.push(new am4charts.StepLineSeries());
+					medianaSeries.noRisers = true;
+					medianaSeries.startLocation = 0.1;
+					medianaSeries.endLocation = 0.9;
+					medianaSeries.dataFields.valueY = "Median";
+					medianaSeries.dataFields.categoryX = "name";
+					medianaSeries.strokeWidth = 2;
+					medianaSeries.stroke = am4core.color("#fff");
+
+					var topSeries = chart.series.push(new am4charts.StepLineSeries());
+					topSeries.noRisers = true;
+					topSeries.startLocation = 0.2;
+					topSeries.endLocation = 0.8;
+					topSeries.dataFields.valueY = "Max";
+					topSeries.dataFields.categoryX = "name";
+					topSeries.stroke = chart.colors.getIndex(0);
+					topSeries.strokeWidth = 2;
+
+					var bottomSeries = chart.series.push(new am4charts.StepLineSeries());
+					bottomSeries.noRisers = true;
+					bottomSeries.startLocation = 0.2;
+					bottomSeries.endLocation = 0.8;
+					bottomSeries.dataFields.valueY = "Min";
+					bottomSeries.dataFields.categoryX = "name";
+					bottomSeries.stroke = chart.colors.getIndex(0);
+					bottomSeries.strokeWidth = 2;
+
+					chart.scrollbarX = new am4core.Scrollbar();
+				});
+			}else if(graphType == "bivariate_bar_segment"){
+				am4core.ready(function() {
+
+				am4core.useTheme(am4themes_animated);
+				var chart = am4core.create("chartdiv", am4charts.XYChart);
+
+				chart.data = data;
+				
+
+				// Create axes
+				var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+				categoryAxis.dataFields.category = "Name";
+				categoryAxis.renderer.grid.template.location = 0;
+
+
+				var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+				valueAxis.renderer.inside = true;
+				valueAxis.renderer.labels.template.disabled = true;
+				valueAxis.min = 0;
+
+				// Create series
+				function createSeries(field, name) {
+				  
+				  // Set up series
+				  var series = chart.series.push(new am4charts.ColumnSeries());
+				  series.name = name;
+				  series.dataFields.valueY = field;
+				  series.dataFields.categoryX = "Name";
+				  series.sequencedInterpolation = true;
+				  
+				  // Make it stacked
+				  series.stacked = true;
+				  
+				  // Configure columns
+				  series.columns.template.width = am4core.percent(60);
+				  series.columns.template.tooltipText = "[bold]{name}[/]\n{valueY}";
+				  
+				  // Add label
+				  var labelBullet = series.bullets.push(new am4charts.LabelBullet());
+				  labelBullet.label.text = "{valueY}";
+				  labelBullet.locationY = 0.5;
+				  labelBullet.label.hideOversized = true;
+				  
+				  return series;
+				}
+				for (let k in data[0]) {
+					if( k != "Name"){ 
+						createSeries(k,k);
+					}
+				}
+				chart.legend = new am4charts.Legend();
+	
+				});
+				
+			}else if(graphType == "bivariate_pie_segment"){
+			am4core.ready(function() {
+
+				am4core.useTheme(am4themes_animated);
+				var chart = am4core.create("chartdiv", am4charts.XYChart);
+
+				chart.data = data;
+				
+
+				// Create axes
+				var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+				categoryAxis.dataFields.category = "Name";
+				categoryAxis.renderer.grid.template.location = 0;
+
+
+				var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+				valueAxis.renderer.inside = true;
+				valueAxis.renderer.labels.template.disabled = true;
+				valueAxis.min = 0;
+
+				// Create series
+				function createSeries(field, name) {
+				  
+				  // Set up series
+				  var series = chart.series.push(new am4charts.ColumnSeries());
+				  series.name = name;
+				  series.dataFields.valueY = field;
+				  series.dataFields.categoryX = "Name";
+				  series.sequencedInterpolation = true;
+				  
+				  // Make it stacked
+				  series.stacked = true;
+				  
+				  // Configure columns
+				  series.columns.template.width = am4core.percent(60);
+				  series.columns.template.tooltipText = "[bold]{name}[/]\n {valueY} %";
+				  
+				  // Add label
+				  var labelBullet = series.bullets.push(new am4charts.LabelBullet());
+				  labelBullet.label.text = "{valueY} %";
+				  labelBullet.locationY = 0.5;
+				  labelBullet.label.hideOversized = true;
+				  
+				  return series;
+				}
+				for (let k in data[0]) {
+					if( k != "Name"){ 
+						createSeries(k,k);
+					}
+				}
+				chart.legend = new am4charts.Legend();
+	
+				});
+				
+			
+			}else if(graphType == "bivariate_bar_pareto"){
+			
+				am4core.ready(function() {
+
+				am4core.useTheme(am4themes_animated);
+				
+				am4core.options.autoSetClassName = true;
+
+				var chart = am4core.create("chartdiv", am4charts.XYChart);
+
+				chart.colors.step = 2;
+				chart.maskBullets = false;
+
+				chart.data = data;
+
+				var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+				categoryAxis.dataFields.category = "name";
+				categoryAxis.renderer.grid.template.location = 0;
+				categoryAxis.renderer.minGridDistance = 30;
+
+
+
+				var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+				valueAxis.title.text = "count";
+				valueAxis.renderer.grid.template.disabled = true;
+
+				var valueAxisT = chart.yAxes.push(new am4charts.ValueAxis());
+				valueAxisT.title.text = "value";
+				valueAxisT.renderer.grid.template.disabled = true;
+				valueAxisT.renderer.opposite = true
+
+				var series = chart.series.push(new am4charts.ColumnSeries());
+				series.dataFields.valueY = "count";
+				series.dataFields.categoryX = "name";
+				series.name = "Count";
+				series.columns.template.tooltipText = "{categoryX}: [bold]{valueY}[/]";
+				series.columns.template.fillOpacity = .8;
+
+				var dState = series.columns.template.states.create("hover");
+				dState.properties.fillOpacity = 0.9;
+
+				var twoSeries = chart.series.push(new am4charts.LineSeries());
+				twoSeries.dataFields.valueY = "value";
+				twoSeries.dataFields.categoryX = "name";
+				twoSeries.name = "Value";
+				twoSeries.yAxis = valueAxisT;
+				twoSeries.tooltipText = "{categoryX}:{valueY}";
+
+				var durationBullet = twoSeries.bullets.push(new am4charts.Bullet());
+
+				var durationRectangle = durationBullet.createChild(am4core.Rectangle);
+				durationBullet.horizontalCenter = "middle";
+				durationBullet.verticalCenter = "middle";
+				durationBullet.width = 7;
+				durationBullet.height = 7;
+				durationRectangle.width = 7;
+				durationRectangle.height = 7;
+
+				var durationState = durationBullet.states.create("hover");
+				durationState.properties.scale = 1.2;
+
+
+				chart.legend = new am4charts.Legend();
+
+				chart.cursor = new am4charts.XYCursor();
+				chart.cursor.fullWidthLineX = true;
+				chart.cursor.lineX.strokeOpacity = 0;
+				chart.cursor.lineX.fill = am4core.color("#000");
+				chart.cursor.lineX.fillOpacity = 0.1;
+
+				});
+			
+			}else if(graphType == "bivariate_pie_interval"){
+			am4core.ready(function() {
+			am4core.useTheme(am4themes_animated);
+			var chart = am4core.create("chartdiv", am4charts.XYChart);
+
+			chart.data = data;
+
+			var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+								categoryAxis.dataFields.category = "name";
+								categoryAxis.renderer.grid.template.location = 0;
+								categoryAxis.renderer.minGridDistance = 30;
+			var valueAxisY = chart.yAxes.push(new am4charts.ValueAxis());
+
+			var series = chart.series.push(new am4charts.LineSeries());
+			series.dataFields.categoryX= "name";
+			series.dataFields.valueY = "mean";
+			series.strokeOpacity = 0;
+
+			var errorBulletY = series.bullets.create(am4charts.ErrorBullet);
+			errorBulletY.isDynamic = true;
+			errorBulletY.strokeWidth = 2;
+			errorBulletY.tooltipText = "{categoryX} : {valueY.value}";
+
+			errorBulletY.adapter.add("pixelHeight", function (pixelHeight, target) {
+			  var dataItem = target.dataItem;
+
+			  if (dataItem) {
+				var value = dataItem.valueY;
+				var errorTopValue = value + dataItem.dataContext.error / 2;
+				var errorTopY = valueAxisY.valueToPoint(errorTopValue).y;
+
+				var errorBottomValue = value - dataItem.dataContext.error / 2;
+				var errorBottomY = valueAxisY.valueToPoint(errorBottomValue).y;
+
+				return Math.abs(errorTopY - errorBottomY);
+			  }
+			  return pixelHeight;
+			})
+
+
+
+			var circle = errorBulletY.createChild(am4core.Circle);
+			circle.radius = 3;
+			circle.fill = am4core.color("#ffffff");
+
+
+			chart.cursor = new am4charts.XYCursor();
+			chart.cursor.behavior = "zoomXY";
+
+			chart.scrollbarX = new am4core.Scrollbar();
+			chart.scrollbarY = new am4core.Scrollbar();
+
+			});
+			}
+		}
+	</script>
+</head>
+<body>
+<div class="row" style="background:aliceblue;">
+    <ul class="nav nav-tabs">
+        <li><a  href="Home.html"><i class="bx bx-md bxs-home"></i>Home</a></li>
+        <li><a  href="Data.html"><i class="bx bx-md bxs-data"></i>Data</a></li>
+        <li class="active"><a href="Exploration.html"><i class="bx bx-md bxs-bar-chart-alt-2"> </i>Exploration</a></li>
+        <li><a  href="Modelling.html"><i class="bx bx-md bx-diamond"></i>Modelling</a></li>
+        <li><a  href="Evaluation.html"><i class="bx bx-md bxs-wrench"></i>Evaluation</a></li>
+        <li><a  href="Deployment.html"><i class="bx bx-md bxs-server"></i>Deployment</a></li>
+    </ul>
+</div>
+
+<div class="tab-content">
+	<div id="data_exploration" style="width:450px; float:left">
+		<div id="fact_table" class="data-exploration-elements">
+			<a href="#"> Fact Table: </a>
+			<select id="fact_tables_dropdown" style="width:250px" class="fact-table-spacing">
+			</select>
+			<span class="checkmark fact-table-spacing" onclick="populate_x_y()">
+				<div class="checkmark_circle"></div>
+				<div class="checkmark_stem"></div>
+				<div class="checkmark_kick"></div>
+			</span>
+		</div>
+		<div id="variables" class="data-exploration-elements">
+			<div id="var_x">
+				<input type="checkbox" id="check_X" name="X" value="X" onchange="enable(this)"> X
+				
+				<select id="var_X_values" class="fact-table-spacing"  style="width:128px" disabled onchange="populate_radio(this)">
+				</select>
+				
+				<input type="radio" value="cat_X" id="cat_X" name="var_type_X" style="margin-left:10px"> Cat
+				<input type="radio" value="num_X" id="num_X" name="var_type_X" style="margin-left:10px"> Num
+				
+				<input type="text" style="width:80px" class="fact-table-spacing"/>
+			</div>
+			<div id="var_y" style="padding-left:2px">
+				<input type="checkbox" id="check_Y" name="Y" value="Y" onchange="enable(this)"> Y
+				
+				<select id="var_Y_values" class="fact-table-spacing" style="width:128px" disabled onchange="populate_radio(this)">
+					
+				</select>
+				
+				<input type="radio" value="cat_Y" id="cat_Y" name="var_type_Y" style="margin-left:10px"> Cat
+				<input type="radio" value="num_Y" id="num_Y" name="var_type_Y" style="margin-left:10px"> Num
+				
+				<input type="text" style="width:80px" class="fact-table-spacing"/>
+			</div>
+		</div>
+		<div id="filters" class="data-exploration-elements">
+			
+		</div>
+		<div id="generate_graph_section" style="padding-top:25px; margin-left:310px;">
+			<i class="fa fa-bar-chart" style="font-size:25px" onclick="plot_chart('bar')"></i>
+			<i class="fa fa-pie-chart" style="font-size:25px; margin-left:15px" onclick="plot_chart('pie')"></i>
+		</div>
+	</div>
+	<div id="plotting" style="width:880px; float:left">
+		<div id="chartdiv"></div>	
+		<div id="stats_table" style="width:880px; float:left; padding-top:15px">
+		</div>
+	</div>
+</div>
+	
+	<script type="text/javascript">
+		var factSelect = document.getElementById("fact_tables_dropdown");
+		populateFilters(3, data);
+		
+		for(var x in data){
+			var factOpt = document.createElement("option");
+			var txtNode = document.createTextNode(x);
+			factOpt.setAttribute("value", x);
+			
+			factOpt.appendChild(txtNode);
+			factSelect.appendChild(factOpt);
+		}
+		
+		function isFactTableLoaded(){
+			if(document.getElementById("fact_tables_dropdown").value != -1){
+				return true;
+			}
+			
+			return false;
+		}
+		function showAlert(msg){
+			alert(msg);
+		}
+		
+		function populate_x_y(){
+			cleanUpPrevious("X");
+			cleanUpPrevious("Y");
+			
+			var factSelect = document.getElementById("fact_tables_dropdown");
+			var filteredData = data[factSelect.value];
+			
+			var all_x = filteredData["X"];
+			var all_y = filteredData["Y"];
+			
+			var xSelect = document.getElementById("var_X_values");
+			var ySelect = document.getElementById("var_Y_values");
+			
+			for(var i=0; i < all_x.length; i++){
+				var xOpt = document.createElement("option");
+				var txtNode = document.createTextNode(all_x[i]["name"]);
+				xOpt.setAttribute("value", all_x[i]["name"]);
+				
+				xOpt.appendChild(txtNode);
+				xSelect.appendChild(xOpt);
+			}
+			
+			for(var i=0; i < all_y.length; i++){
+				var yOpt = document.createElement("option");
+				var txtNode = document.createTextNode(all_y[i]["name"]);
+				yOpt.setAttribute("value", all_y[i]["name"]);
+				
+				yOpt.appendChild(txtNode);
+				ySelect.appendChild(yOpt);
+			}
+			
+			/*
+				Mimicing the application behavior
+				
+				xSelect.removeAttribute("disabled");
+				ySelect.removeAttribute("disabled");
+			*/
+		}
+		
+		function enable(ref){
+			if(isFactTableLoaded){
+				var axis = ref.id.split("_")[1];
+				
+				if(!ref.checked){
+					document.getElementById("var_"+axis+"_values").setAttribute("disabled", true);
+				}else{
+					document.getElementById("var_"+axis+"_values").removeAttribute("disabled");
+				}
+			}else{
+				ref.checked = false;
+				showAlert("Select the fact table first!");
+			}
+		}
+		
+		function populate_radio(ref){
+			var axis = ref.id.split("_")[1];
+			var allPossible = data[document.getElementById("fact_tables_dropdown").value][axis];
+			var selectedType = "";
+			
+			for(var x=0; x < allPossible.length ; x++){
+				if(ref.value == allPossible[x]["name"]){
+					selectedType = allPossible[x]["type"];
+					break;
+				}
+			}
+			
+			if(selectedType == "categorical"){
+				document.getElementById("cat_"+axis).checked = true;
+			}else{
+				document.getElementById("num_"+axis).checked = true;
+			}
+		}
+		
+		function cleanUpPrevious(id){
+			//checkbox X, Y
+			//dropdown null
+			//radio button unselect
+			
+			document.getElementById("check_"+id).checked = false;
+			document.getElementById("var_"+id+"_values").innerHTML = "";
+			document.getElementById("cat_"+id).checked = false;
+			document.getElementById("num_"+id).checked = false;
+			
+			document.getElementById("var_"+id+"_values").setAttribute("disabled", true);
+		}
+		
+		function populateFilters(num, data){
+			var filterMainDiv = document.getElementById("filters");
+			
+			for(var x = 0; x < num; x++){
+				var filterDiv = document.createElement("div");
+				filterDiv.setAttribute("id","filter_"+(x+1).toString());
+				
+				var inputField = document.createElement("input");
+				inputField.setAttribute("type","checkbox");
+				inputField.setAttribute("onchange","loadFilters(this)");
+				inputField.setAttribute("id", "filter_cb_"+(x+1).toString());
+				inputField.setAttribute("filterNo",(x+1).toString());
+				inputField.setAttribute("name", "filter_cb_"+(x+1).toString());
+				inputField.setAttribute("value", "filter_cb_"+(x+1).toString());
+				inputField.setAttribute("style","margin-right:12px");
+				
+				var text = document.createTextNode((x+1).toString());
+				
+				var selectFilter = document.createElement("select");
+				selectFilter.setAttribute("id","filter_select_"+(x+1).toString());
+				selectFilter.setAttribute("style","margin-left:10px; width: 170px");
+				selectFilter.setAttribute("disabled", true);
+				selectFilter.setAttribute("filterNo",(x+1).toString());
+				selectFilter.setAttribute("onchange", "populateValueFilter(this)");
+				
+				var valueFilter = document.createElement("select");
+				valueFilter.setAttribute("id","filter_value_"+(x+1).toString());
+				valueFilter.setAttribute("style","margin-left:10px; width: 170px");
+				valueFilter.setAttribute("disabled", true);
+				
+				filterDiv.appendChild(inputField);
+				filterDiv.appendChild(text);
+				filterDiv.appendChild(selectFilter);
+				filterDiv.appendChild(valueFilter);
+				
+				filterMainDiv.appendChild(filterDiv);
+			}
+		}
+		
+		function loadFilters(cb){
+			var toBeChanged = cb.getAttribute("filterNo");
+			var dataSelected = document.getElementById("fact_tables_dropdown").value;
+			
+			/*
+				var opts = ["Random", "target", "geo_accession"]
+				
+				for(var y=0; y < opts.length; y++){
+					var optTag = document.createElement("option");
+					optTag.setAttribute("id", "filter_val_" + (x+1).toString() + "_" + opts[y]);
+					optTag.setAttribute("value", opts[y]);
+					optTag.innerHTML = opts[y];
+					
+					valueFilter.appendChild(optTag);
+				}
+			*/
+			
+			var selectFilter = document.getElementById("filter_select_" + toBeChanged);
+			selectFilter.disabled = false;
+			
+			var opts = [];
+			var values = {};
+			
+			for(var i=0; i < data[dataSelected]["X"].length; i++){
+				if(data[dataSelected]["X"][i]["type"] == "categorical"){
+					opts.push(data[dataSelected]["X"][i]["name"]);
+				}
+			}
+			
+			for(var y=0; y < opts.length; y++){
+				var optTag = document.createElement("option");
+				optTag.setAttribute("id", "filter_" + (x+1).toString() + "_" + opts[y]);
+				optTag.setAttribute("value", opts[y]);
+				optTag.innerHTML = opts[y];
+				
+				selectFilter.appendChild(optTag);
+			}
+			
+		}
+		
+		async function populateValueFilter(vf){
+			var toBeChanged = vf.getAttribute("filterNo");
+			var dataSelected = document.getElementById("fact_tables_dropdown").value;
+			var filterName = document.getElementById(vf.getAttribute("id")).value;
+			
+			var valueFilter = document.getElementById("filter_value_" + toBeChanged);
+			
+			valueFilter.disabled = false;
+			var opts = await getOptionValues(dataSelected, filterName);
+			
+			for(var y=0; y < opts.length; y++){
+				var optTag = document.createElement("option");
+				optTag.setAttribute("id", "filter_" + (x+1).toString() + "_" + opts[y]);
+				optTag.setAttribute("value", opts[y]);
+				optTag.innerHTML = opts[y];
+				
+				valueFilter.appendChild(optTag);
+			}
+			
+		}
+		
+		function getOptionValues(tableName, columnName){
+			return new Promise((resolve, reject) => {
+				var retRes = [];
+				
+				var res = {
+					"tableName" : tableName,
+					"columns" : [{"columnName" : columnName, "columnType":"categorical"}] ,
+					"analysis" : "univariate",
+					"chartType" : "bar"
+				};
+						
+				var SERVER_URL = "http://localhost:8000/";
+				var REST_API = SERVER_URL + "getPlotData";
+				var token = '{{csrf_token}}';
+				
+				var xhttp = new XMLHttpRequest();
+				xhttp.open("POST", REST_API, true);
+				xhttp.setRequestHeader("Content-Type", "application/json");
+				xhttp.setRequestHeader("X-CSRFToken", token);
+				
+				xhttp.onload = function (e)
+				{
+					if (xhttp.readyState === 4)
+					{
+						if (xhttp.status === 200)
+						{
+							var XX = JSON.parse(xhttp.responseText)["data"];
+							for(var X=0; X < XX.length; X++){
+								retRes.push(XX[X]["label"]);
+							}
+							
+							console.log("SERVER RESPONSE IS NOW READY: ", retRes);
+							resolve(retRes);
+						}else{
+							alert("Error Occured! Check logs");
+							console.error("Server error: ", xhttp.statusText);
+						}
+					}
+				};
+				xhttp.onerror = function (e)
+				{
+					console.error("Error connecting to: ", SERVER_URL);
+				};
+				
+				xhttp.send(JSON.stringify(res));
+			})
+		}
+		
+	</script>
+</body>
+</html>

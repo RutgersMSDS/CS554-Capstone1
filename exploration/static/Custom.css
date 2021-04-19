@@ -1,0 +1,21 @@
+.nav>li {
+    text-align: center;
+    width: 15vw;;
+}
+
+#home {
+    background-image: url("Images/Bioada-ds.png");
+}
+
+.bx{
+    line-height: 2;
+}
+body{
+    font-family: none;
+    font-size: large;
+}
+
+/*.active a {*/
+/*    background-color: lavender !important;*/
+
+/*}*/
