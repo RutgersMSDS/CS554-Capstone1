@@ -1,9 +1,10 @@
 from django.shortcuts import render
 import json
-from . import load_fact_table_helper_SQL as ftable
-from . import helperPlot as hp
 from django.http import JsonResponse
 from django.template import RequestContext
+
+from . import load_fact_table_helper_SQL as ftable
+from . import helperPlot as hp
 
 response = ftable.gather_all_data()
 

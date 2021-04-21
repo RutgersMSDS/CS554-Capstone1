@@ -1,7 +1,6 @@
-import pymssql
+from Bioada import DBHelper as db_con
 
-conn = pymssql.connect(server='13.92.0.168', user='saedsayad', password='mordab1339235$', database='GSE13355')
-cursor = conn.cursor()
+cursor = db_con.DBConnection.Instance().cursor
 
 def get_datatype(table_name):
     dataTypeSQL = "SELECT DATA_TYPE, COLUMN_NAME FROM [GSE13355].[INFORMATION_SCHEMA].[COLUMNS] WHERE TABLE_NAME = '" + table_name + "'"

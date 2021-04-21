@@ -5,16 +5,14 @@ TO DISCUSS:
     * How to calculate percentage in each column chart? (data coming from backend???) (No need to focus rn)
 """
 
-import pymssql
 import statistics
 import numpy as np
-
 import scipy.stats
 from scipy.stats import chi2_contingency
-from scipy.stats import chi2 
+from scipy.stats import chi2
 
-conn = pymssql.connect(server='13.92.0.168', user='saedsayad', password='mordab1339235$', database='GSE13355')
-cursor = conn.cursor()
+from Bioada import DBHelper as db_con
+cursor = db_con.DBConnection.Instance().cursor
 
 """
 Get data for univariate analysis.
