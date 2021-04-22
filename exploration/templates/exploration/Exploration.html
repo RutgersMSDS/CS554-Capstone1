@@ -5,16 +5,21 @@
     <title>Bioada</title>
     <!-- <link href="../bootstrap/css/bootstrap.css" rel="stylesheet"> -->
     <link href="static/boxicons/css/boxicons.min.css" rel="stylesheet"> 
-    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  
 	<script src="static/jquery/jquery.min.js"></script>
-    <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 		
 	<script src="https://cdn.amcharts.com/lib/4/core.js"></script>
 	<script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
 	<script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
-
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	
+  
     <link href="static/Custom.css" rel="stylesheet">
 	<style>
 		.tab {
@@ -105,7 +110,6 @@
 		}
 		
 		.data-exploration-elements {
-			padding-top: 15px;
 			padding-left: 20px
 		}
 		
@@ -729,61 +733,79 @@
     </ul>
 </div>
 
-<div class="tab-content">
-	<div id="data_exploration" style="width:450px; float:left">
-		<div id="fact_table" class="data-exploration-elements">
-			<a href="#"> Fact Table: </a>
-			<select id="fact_tables_dropdown" style="width:250px" class="fact-table-spacing">
-			</select>
+<div class="row tab-content">
+	<div id="data_exploration" class="col-md-4" style="float:left">
+		<div id="fact_table" class="data-exploration-elements" >
+			<span id="helpBlock" class="help-block" style="float:left"> Fact Table: &nbsp </span>
+			<div class="dropdown" style="width: 67.5%; float:left">
+				<select class="form-control form-control-sm" id="fact_tables_dropdown">
+				</select>
+			</div>
 			<span class="checkmark fact-table-spacing" onclick="populate_x_y()">
 				<div class="checkmark_circle"></div>
 				<div class="checkmark_stem"></div>
 				<div class="checkmark_kick"></div>
 			</span>
 		</div>
-		<div id="variables" class="data-exploration-elements">
+		
+		<div id="variables" style="clear:left; float:left" class="data-exploration-elements">
 			<div id="var_x">
-				<input type="checkbox" id="check_X" name="X" value="X" onchange="enable(this)"> X
+				<div class="checkbox" style="float:left">
+					<label><input type="checkbox" id="check_X" name="X" value="X" onchange="enable(this)"> X &nbsp </label>
+				</div>
+				<div class="dropdown" style="width: 35%; float:left">
+					<select id="var_X_values" class="form-control form-control-md " disabled onchange="populate_radio(this)">
+					</select>
+				</div>
 				
-				<select id="var_X_values" class="fact-table-spacing"  style="width:128px" disabled onchange="populate_radio(this)">
-				</select>
+				<div style="float:left">
+					<label class="radio-inline" style="margin-left:5px"><input type="radio" value="cat_X" id="cat_X" name="var_type_X"> Cat</label>
+					<label class="radio-inline" style="margin-left:5px"><input type="radio" value="num_X" id="num_X" name="var_type_X"> Num</label>
+				</div>
 				
-				<input type="radio" value="cat_X" id="cat_X" name="var_type_X" style="margin-left:10px"> Cat
-				<input type="radio" value="num_X" id="num_X" name="var_type_X" style="margin-left:10px"> Num
-				
-				<input type="text" style="width:80px" class="fact-table-spacing"/>
+				<div class="form-group" style="width:20%; float:left; margin-left:10px">
+					<input type="text" class="form-control" id="usr">
+				</div>
 			</div>
-			<div id="var_y" style="padding-left:2px">
-				<input type="checkbox" id="check_Y" name="Y" value="Y" onchange="enable(this)"> Y
-				
-				<select id="var_Y_values" class="fact-table-spacing" style="width:128px" disabled onchange="populate_radio(this)">
-					
-				</select>
-				
-				<input type="radio" value="cat_Y" id="cat_Y" name="var_type_Y" style="margin-left:10px"> Cat
-				<input type="radio" value="num_Y" id="num_Y" name="var_type_Y" style="margin-left:10px"> Num
-				
-				<input type="text" style="width:80px" class="fact-table-spacing"/>
-			</div>
-		</div>
-		<div id="filters" class="data-exploration-elements">
 			
+			<div id="var_y">
+				<div class="checkbox" style="float:left">
+					<label><input type="checkbox" id="check_Y" name="Y" value="Y" onchange="enable(this)"> Y &nbsp </label>
+				</div>
+				<div class="dropdown" style="width: 35%; float:left">
+					<select id="var_Y_values" class="form-control form-control-sm" disabled onchange="populate_radio(this)">
+					</select>
+				</div>
+				
+				<div style="float:left">
+					<label class="radio-inline" style="margin-left:5px"><input type="radio" value="cat_Y" id="cat_Y" name="var_type_Y"> Cat </label>
+					<label class="radio-inline" style="margin-left:5px"><input type="radio" value="num_Y" id="num_Y" name="var_type_Y"> Num</label>
+				</div>
+				
+				<div class="form-group" style="width:20%; float:left; margin-left:10px">
+					<input type="text" class="form-control" id="usr">
+				</div>
+			</div>
 		</div>
-		<div id="generate_graph_section" style="padding-top:25px; margin-left:310px;">
-			<i class="fa fa-bar-chart" style="font-size:25px" onclick="plot_chart('bar')"></i>
-			<i class="fa fa-pie-chart" style="font-size:25px; margin-left:15px" onclick="plot_chart('pie')"></i>
+		
+		<div id="filters" style="clear:left" class="data-exploration-elements">
+		</div>
+		
+		<div id="generate_graph_section" style="clear:left; float:left; padding-top:10px; margin-left:79%;">
+			<img src="static/images/chart-bar-24.png" style="height:25px;width:25px" onclick="plot_chart('bar')"></img>
+			<img src="static/images/chart-pie-24.png" style="margin-left:15px;height:25px;width:25px" onclick="plot_chart('pie')"></img>
 		</div>
 	</div>
-	<div id="plotting" style="width:880px; float:left">
+	<div id="plotting" class="col-md-8" style="float:left">
 		<div id="chartdiv"></div>	
-		<div id="stats_table" style="width:880px; float:left; padding-top:15px">
+		<div id="stats_table" style="padding-top:15px; width:-webkit-fill-available">
 		</div>
 	</div>
 </div>
 	
 	<script type="text/javascript">
 		var factSelect = document.getElementById("fact_tables_dropdown");
-		populateFilters(3, data);
+		populateFilters(2, data);
 		
 		for(var x in data){
 			var factOpt = document.createElement("option");
@@ -898,6 +920,14 @@
 				var filterDiv = document.createElement("div");
 				filterDiv.setAttribute("id","filter_"+(x+1).toString());
 				
+				//First Checkbox
+				
+				var checkBoxDiv = document.createElement("div");
+				checkBoxDiv.setAttribute("style", "clear:left; float:left");
+				checkBoxDiv.setAttribute("class", "checkbox");
+				
+				var labelChckBox = document.createElement("label");
+				
 				var inputField = document.createElement("input");
 				inputField.setAttribute("type","checkbox");
 				inputField.setAttribute("onchange","loadFilters(this)");
@@ -905,26 +935,44 @@
 				inputField.setAttribute("filterNo",(x+1).toString());
 				inputField.setAttribute("name", "filter_cb_"+(x+1).toString());
 				inputField.setAttribute("value", "filter_cb_"+(x+1).toString());
-				inputField.setAttribute("style","margin-right:12px");
 				
 				var text = document.createTextNode((x+1).toString());
 				
+				labelChckBox.appendChild(inputField);
+				labelChckBox.appendChild(text);
+				checkBoxDiv.appendChild(labelChckBox);
+				
+				//Second filter dropdown
+				
+				var selectBoxDiv = document.createElement("div");
+				selectBoxDiv.setAttribute("style", "width: 42%;margin-left:10px;  float:left");
+				selectBoxDiv.setAttribute("class", "dropdown");
+				
 				var selectFilter = document.createElement("select");
 				selectFilter.setAttribute("id","filter_select_"+(x+1).toString());
-				selectFilter.setAttribute("style","margin-left:10px; width: 170px");
 				selectFilter.setAttribute("disabled", true);
 				selectFilter.setAttribute("filterNo",(x+1).toString());
 				selectFilter.setAttribute("onchange", "populateValueFilter(this)");
+				selectFilter.setAttribute("class", "form-control form-control-md");
+				
+				selectBoxDiv.appendChild(selectFilter);
+				
+				//Third value dropdown
+				
+				var valueBoxDiv = document.createElement("div");
+				valueBoxDiv.setAttribute("style", "width: 42%; margin-left:8px; float:left");
+				valueBoxDiv.setAttribute("class", "dropdown");
 				
 				var valueFilter = document.createElement("select");
 				valueFilter.setAttribute("id","filter_value_"+(x+1).toString());
-				valueFilter.setAttribute("style","margin-left:10px; width: 170px");
 				valueFilter.setAttribute("disabled", true);
+				valueFilter.setAttribute("class", "form-control form-control-md");
 				
-				filterDiv.appendChild(inputField);
-				filterDiv.appendChild(text);
-				filterDiv.appendChild(selectFilter);
-				filterDiv.appendChild(valueFilter);
+				valueBoxDiv.appendChild(valueFilter);
+				
+				filterDiv.appendChild(checkBoxDiv);
+				filterDiv.appendChild(selectBoxDiv);
+				filterDiv.appendChild(valueBoxDiv);
 				
 				filterMainDiv.appendChild(filterDiv);
 			}
