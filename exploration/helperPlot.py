@@ -92,18 +92,23 @@ def get_bivariate_data(attrType_x,attrType_y,columnName_x,columnName_y, tableNam
         
         cursor.execute(dataSQL)
         results = cursor.fetchall()
+        
         data_bar=[]
         data_pie=[]
+        
         table=[]
         t_mean= 0
         
         for x in results:
             data_col_bar={}
             data_col_pie={}
+            
             data_col_bar["name"]=x[0]
             data_col_bar["count"]=x[3]
             data_col_bar["value"]=x[1]/x[3]
+            
             table.append(x)
+            
             data_col_pie["name"]=x[0]
             data_col_pie["mean"]=x[1]/x[3]
             data_col_pie["error"]=0.3

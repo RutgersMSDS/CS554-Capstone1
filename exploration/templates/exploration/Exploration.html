@@ -142,22 +142,14 @@
 					curr["columnType"] = "numerical";
 				}
 				
-				//var actualDataType = data[tableName]["X"].find(o => o.name === curr["columnName"])["type"];
+				var binInput = document.getElementById("var_X_bin_val").value;
 				
-				if(curr["columnType"] == "numerical" && type == "pie"){
-					curr["isBinningRequired"] = true;
-					
-					var binInput = document.getElementById("var_X_bin_val").value;
-					
-					if(binInput.length == 0){
-						alert("Provide the size of the bin for attribute " + curr["columnName"] + " on X");
-						return;
-					}
-					
-					curr["binningSize"] = binInput;
-				}else{
+				if(binInput.length == 0){
 					curr["isBinningRequired"] = false;
 					curr["binningSize"] = 0;
+				}else{
+					curr["isBinningRequired"] = true;
+					curr["binningSize"] = binInput;
 				}
 				
 				columns.push(curr);
@@ -173,19 +165,14 @@
 					curr["columnType"] = "numerical";
 				}
 				
-				if(curr["columnType"] == "categorical" && type == "pie"){
-					curr["isBinningRequired"] = true;
-					
-					var binInput = document.getElementById("var_Y_bin_val").value;
-					
-					if(binInput.length == 0){
-						alert("Provide the size of the bin for attribute " + curr["columnName"] + " on Y");
-						return;
-					}
-					curr["binningSize"] = binInput;
-				}else{
+				var binInput = document.getElementById("var_Y_bin_val").value;
+				
+				if(binInput.length == 0){
 					curr["isBinningRequired"] = false;
 					curr["binningSize"] = 0;
+				}else{
+					curr["isBinningRequired"] = true;
+					curr["binningSize"] = binInput;
 				}
 				
 				columns.push(curr);
@@ -232,12 +219,11 @@
 							renderAMCharts("univariate_bar", data);
 						}else if(analysisType == "univariate" && type == "pie" && columns[0]["columnType"] == "categorical"){
 							renderAMCharts("univariate_pie", data);
-						}else if(analysisType == "univariate" && type == "pie" && columns[0]["columnType"] == "numerical"){
-							if(columns[0]["isBinningRequired"]){
-								console.log("Now I will plot based on binning!");
-							}
-						}
-						else if(analysisType == "univariate" && type == "bar" && columns[0]["columnType"] == "numerical"){
+						}else if(analysisType == "univariate" && type == "bar" && columns[0]["columnType"] == "numerical" && columns[0]["isBinningRequired"]){
+							renderAMCharts("univariate_bar", data);
+						}else if(analysisType == "univariate" && type == "pie" && columns[0]["columnType"] == "numerical" && columns[0]["isBinningRequired"]){
+							renderAMCharts("univariate_pie", data);
+						}else if(analysisType == "univariate" && type == "bar" && columns[0]["columnType"] == "numerical"){
 							renderAMCharts("univariate_bar_box", data);
 						}else if(analysisType == "bivariate" && type == "bar" && (columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "numerical") ){
 							renderAMCharts("bivariate_bar_scatter", data["data"][0]);
@@ -277,7 +263,7 @@
 			resTable.style.width = "inherit";
 			
 			if(analysisType == "univariate"){
-				if(columns[0]["columnType"] == "numerical"){
+				if(columns[0]["columnType"] == "numerical" && !columns[0]["isBinningRequired"]){
 					var cols = [];
 					var singleRow = [];
 					
