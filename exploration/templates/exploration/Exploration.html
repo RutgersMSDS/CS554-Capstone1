@@ -141,6 +141,25 @@
 				}else{
 					curr["columnType"] = "numerical";
 				}
+				
+				//var actualDataType = data[tableName]["X"].find(o => o.name === curr["columnName"])["type"];
+				
+				if(curr["columnType"] == "numerical" && type == "pie"){
+					curr["isBinningRequired"] = true;
+					
+					var binInput = document.getElementById("var_X_bin_val").value;
+					
+					if(binInput.length == 0){
+						alert("Provide the size of the bin for attribute " + curr["columnName"] + " on X");
+						return;
+					}
+					
+					curr["binningSize"] = binInput;
+				}else{
+					curr["isBinningRequired"] = false;
+					curr["binningSize"] = 0;
+				}
+				
 				columns.push(curr);
 			}
 			
@@ -153,6 +172,22 @@
 				}else{
 					curr["columnType"] = "numerical";
 				}
+				
+				if(curr["columnType"] == "categorical" && type == "pie"){
+					curr["isBinningRequired"] = true;
+					
+					var binInput = document.getElementById("var_Y_bin_val").value;
+					
+					if(binInput.length == 0){
+						alert("Provide the size of the bin for attribute " + curr["columnName"] + " on Y");
+						return;
+					}
+					curr["binningSize"] = binInput;
+				}else{
+					curr["isBinningRequired"] = false;
+					curr["binningSize"] = 0;
+				}
+				
 				columns.push(curr);
 			}
 			
@@ -197,7 +232,12 @@
 							renderAMCharts("univariate_bar", data);
 						}else if(analysisType == "univariate" && type == "pie" && columns[0]["columnType"] == "categorical"){
 							renderAMCharts("univariate_pie", data);
-						}else if(analysisType == "univariate" && type == "bar" && columns[0]["columnType"] == "numerical"){
+						}else if(analysisType == "univariate" && type == "pie" && columns[0]["columnType"] == "numerical"){
+							if(columns[0]["isBinningRequired"]){
+								console.log("Now I will plot based on binning!");
+							}
+						}
+						else if(analysisType == "univariate" && type == "bar" && columns[0]["columnType"] == "numerical"){
 							renderAMCharts("univariate_bar_box", data);
 						}else if(analysisType == "bivariate" && type == "bar" && (columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "numerical") ){
 							renderAMCharts("bivariate_bar_scatter", data["data"][0]);
@@ -759,12 +799,12 @@
 				</div>
 				
 				<div style="float:left">
-					<label class="radio-inline" style="margin-left:5px"><input type="radio" value="cat_X" id="cat_X" name="var_type_X"> Cat</label>
-					<label class="radio-inline" style="margin-left:5px"><input type="radio" value="num_X" id="num_X" name="var_type_X"> Num</label>
+					<label class="radio-inline" style="margin-left:5px"><input type="radio" value="cat_X" id="cat_X" name="var_type_X" onchange="flip_disability(this)"> Cat</label>
+					<label class="radio-inline" style="margin-left:5px"><input type="radio" value="num_X" id="num_X" name="var_type_X" onchange="flip_disability(this)"> Num</label>
 				</div>
 				
 				<div class="form-group" style="width:20%; float:left; margin-left:10px">
-					<input type="text" class="form-control" id="usr">
+					<input type="text" disabled class="form-control" id="var_X_bin_val">
 				</div>
 			</div>
 			
@@ -778,12 +818,12 @@
 				</div>
 				
 				<div style="float:left">
-					<label class="radio-inline" style="margin-left:5px"><input type="radio" value="cat_Y" id="cat_Y" name="var_type_Y"> Cat </label>
-					<label class="radio-inline" style="margin-left:5px"><input type="radio" value="num_Y" id="num_Y" name="var_type_Y"> Num</label>
+					<label class="radio-inline" style="margin-left:5px"><input type="radio" value="cat_Y" id="cat_Y" name="var_type_Y" onchange="flip_disability(this)"> Cat </label>
+					<label class="radio-inline" style="margin-left:5px"><input type="radio" value="num_Y" id="num_Y" name="var_type_Y" onchange="flip_disability(this)"> Num</label>
 				</div>
 				
 				<div class="form-group" style="width:20%; float:left; margin-left:10px">
-					<input type="text" class="form-control" id="usr">
+					<input type="text" disabled class="form-control" id="var_Y_bin_val">
 				</div>
 			</div>
 		</div>
@@ -797,8 +837,8 @@
 		</div>
 	</div>
 	<div id="plotting" class="col-md-8" style="float:left">
-		<div id="chartdiv"></div>	
-		<div id="stats_table" style="padding-top:15px; width:-webkit-fill-available">
+		<div id="chartdiv" style="height:75vh"></div>	
+		<div id="stats_table" style="padding-top:15px; width:-webkit-fill-available;height:12vh; padding-right:8px">
 		</div>
 	</div>
 </div>
@@ -881,8 +921,20 @@
 			}
 		}
 		
+		function flip_disability(ref){
+			var axis = ref.id.split("_")[1];
+			
+			if(ref.id == "cat_" + axis){
+				document.getElementById("var_" + axis + "_bin_val").disabled = true;
+			}else{
+				document.getElementById("var_" + axis + "_bin_val").disabled = false;
+			}
+		}
+		
+		
 		function populate_radio(ref){
 			var axis = ref.id.split("_")[1];
+			
 			var allPossible = data[document.getElementById("fact_tables_dropdown").value][axis];
 			var selectedType = "";
 			
@@ -895,8 +947,10 @@
 			
 			if(selectedType == "categorical"){
 				document.getElementById("cat_"+axis).checked = true;
+				document.getElementById("var_" + axis + "_bin_val").disabled = true;
 			}else{
 				document.getElementById("num_"+axis).checked = true;
+				document.getElementById("var_" + axis + "_bin_val").disabled = false;
 			}
 		}
 		
@@ -911,6 +965,7 @@
 			document.getElementById("num_"+id).checked = false;
 			
 			document.getElementById("var_"+id+"_values").setAttribute("disabled", true);
+			document.getElementById("var_"+ id + "_bin_val").disabled = true;
 		}
 		
 		function populateFilters(num, data){
