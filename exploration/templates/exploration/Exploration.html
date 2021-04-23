@@ -219,12 +219,14 @@
 							renderAMCharts("univariate_bar", data);
 						}else if(analysisType == "univariate" && type == "pie" && columns[0]["columnType"] == "categorical"){
 							renderAMCharts("univariate_pie", data);
+						}else if(analysisType == "univariate" && type == "bar" && columns[0]["columnType"] == "numerical" && !columns[0]["isBinningRequired"]){
+							renderAMCharts("univariate_bar_box", data);
+						}else if(analysisType == "univariate" && type == "pie" && columns[0]["columnType"] == "numerical" && !columns[0]["isBinningRequired"]){
+							renderAMCharts("univariate_bar_box", data);
 						}else if(analysisType == "univariate" && type == "bar" && columns[0]["columnType"] == "numerical" && columns[0]["isBinningRequired"]){
 							renderAMCharts("univariate_bar", data);
 						}else if(analysisType == "univariate" && type == "pie" && columns[0]["columnType"] == "numerical" && columns[0]["isBinningRequired"]){
 							renderAMCharts("univariate_pie", data);
-						}else if(analysisType == "univariate" && type == "bar" && columns[0]["columnType"] == "numerical"){
-							renderAMCharts("univariate_bar_box", data);
 						}else if(analysisType == "bivariate" && type == "bar" && (columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "numerical") ){
 							renderAMCharts("bivariate_bar_scatter", data["data"][0]);
 						}else if(analysisType == "bivariate" && type == "pie" && (columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "numerical") ){
@@ -412,6 +414,19 @@
 					bottomSeries.dataFields.categoryX = "x_axis";
 					bottomSeries.stroke = chart.colors.getIndex(0);
 					bottomSeries.strokeWidth = 2;
+					
+					if("outliers" in data["data"][0]){
+						var outliers = data["data"][0]["outliers"];
+						console.log("OUTLIERS WILL BE DISPLAYED!!", outliers);
+						
+						var bulletSeries = chart.series.push(new am4charts.LineSeries());
+						bulletSeries.strokeOpacity = 0;
+						bulletSeries.data = outliers;
+						bulletSeries.dataFields.valueY = "val";
+						bulletSeries.dataFields.categoryX = "x_axis";
+						var bullet = bulletSeries.bullets.push(new am4charts.CircleBullet());
+						bulletSeries.tooltipText = "{valueY.value}";
+					}
 
 					chart.scrollbarX = new am4core.Scrollbar();
 				});
@@ -933,6 +948,8 @@
 			
 			if(selectedType == "categorical"){
 				document.getElementById("cat_"+axis).checked = true;
+				document.getElementById("var_" + axis + "_bin_val").value = "";
+				document.getElementById("var_" + axis + "_bin_val").innerHTML = "";
 				document.getElementById("var_" + axis + "_bin_val").disabled = true;
 			}else{
 				document.getElementById("num_"+axis).checked = true;

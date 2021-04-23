@@ -24,7 +24,7 @@ Accepts:
 Returns:
     Statistics of the given column of given table.
 """
-def get_univariate_data(attrType, columnName, tableName):
+def get_univariate_data(attrType, columnName, tableName, chartType):
     dataSQL = ""
     data = {}
     
@@ -49,6 +49,13 @@ def get_univariate_data(attrType, columnName, tableName):
         details["Mean"] = round(np.mean(results), 4)
         details["StDev"] = round(statistics.stdev(results), 4)
         
+        if(chartType == "pie"):
+            IQR = Q3 - Q1
+            upper = Q3 + (1.5 * IQR)
+            lower = Q1 - (1.5 * IQR)
+            
+            outliers = [x for x in results if(x < lower or x > upper)]
+            details["outliers"] = [{"val" : 1}]
         
         data["x_axis"] = columnName
         data["y_axis"] = "Value"
