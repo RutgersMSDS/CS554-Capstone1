@@ -42,20 +42,28 @@ def get_univariate_data(attrType, columnName, tableName, chartType):
         
         Q3, Q1 = np.percentile(results, [75 ,25])
         
+        IQR = Q3 - Q1
+        
+        upper = Q3 + (1.5 * IQR)
+        lower = Q1 - (1.5 * IQR)
+        
         details["Q1"] = round(Q1, 4)
         details["Median"] = round(statistics.median(results), 4)
         details["Q3"] = round(Q3, 4)
         details["Max"] = round(max(results), 4)
         details["Mean"] = round(np.mean(results), 4)
         details["StDev"] = round(statistics.stdev(results), 4)
+        details["MinBox"] = lower
+        details["MaxBox"] = upper
         
         if(chartType == "pie"):
-            IQR = Q3 - Q1
-            upper = Q3 + (1.5 * IQR)
-            lower = Q1 - (1.5 * IQR)
-            
             outliers = [x for x in results if(x < lower or x > upper)]
-            details["outliers"] = [{"val" : 1}]
+            curr = []
+            
+            for x in outliers:
+                curr.append({"x_axis": columnName, "val": x})
+            
+            details["outliers"] = curr
         
         data["x_axis"] = columnName
         data["y_axis"] = "Value"

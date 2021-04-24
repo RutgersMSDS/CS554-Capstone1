@@ -264,6 +264,8 @@
 			resTable.style.border = "1px solid #000";
 			resTable.style.width = "inherit";
 			
+			var exclude = ["MinBox", "MaxBox", "outliers"]
+			
 			if(analysisType == "univariate"){
 				if(columns[0]["columnType"] == "numerical" && !columns[0]["isBinningRequired"]){
 					var cols = [];
@@ -276,6 +278,11 @@
 					dataRow.style.border = "1px solid #000"
 					
 					for(var x in data["data"][0]){
+						
+						if(exclude.includes(x)){
+							continue;
+						}
+						
 						var colCell = document.createElement("td");
 						colCell.style.border = "1px solid #000"
 						colCell.style.textAlign = "center";

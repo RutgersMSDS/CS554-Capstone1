@@ -22,6 +22,13 @@ def get_tuples_and_nums(pos, neg, step):
 
 def get_matching_tuple(ls, target):
     x = bisect.bisect(ls, target)
+    
+    if(x == 0):
+        return (0, 1)
+    
+    if(x == len(ls)):
+        return (ls[x-2], ls[x-1])
+    
     return (ls[x-1], ls[x])
 
 def get_univariate_binned_data(attrType, columnName, tableName, binSize):
@@ -41,7 +48,6 @@ def get_univariate_binned_data(attrType, columnName, tableName, binSize):
     totalNeg = abs(math.floor(modified_min / binSize))
     
     all_pairs, nums = get_tuples_and_nums(totalPos, totalNeg, binSize)
-    
     count_dic = {}
     
     for a in all_pairs:
