@@ -70,3 +70,195 @@ def get_univariate_binned_data(attrType, columnName, tableName, binSize):
     
     res["data"] = curr
     return res
+def get_bivariate_binned_data(column_data,tableName):
+    
+    columnName_x = column_data[0]["columnName"]
+    attrType_x = column_data[0]["columnType"]
+    binSize_x = int(column_data[0]["binningSize"])
+    
+    columnName_y = column_data[1]["columnName"]
+    attrType_y = column_data[1]["columnType"]
+    binSize_y = int(column_data[1]["binningSize"])
+    
+    
+    if(binSize_x != 0):
+        attrType_x = "binning"
+    if(binSize_y != 0):
+        attrType_y = "binning"
+    
+    
+        
+    if(attrType_x == "binning" and attrType_y == "numerical" ):
+        data={}
+    elif(attrType_x == "binning" and attrType_y == "categorical" ):
+        dataSQL = "SELECT [" + columnName_x + "],["+ columnName_y +  "] from GSE13355.dbo." + tableName 
+        cursor.execute(dataSQL)
+        results = cursor.fetchall()
+        print(attrType_x,attrType_y)    
+        result_x = []
+        
+        ans_cols={}
+        
+        for x in results:
+            result_x.append(x[0])
+            
+            
+        minVal = min(result_x)
+        maxVal = max(result_x)
+        print(minVal)
+        print(maxVal)
+        
+        modified_min = math.floor(minVal)
+        modified_max = math.ceil(maxVal)
+        
+        totalPos = math.ceil(modified_max / binSize_x)
+        totalNeg = math.floor(modified_min / binSize_x)
+        
+        key_dict=set()
+        for i in range(totalNeg,totalPos,1):
+            key_dict.add((i*binSize_x,(i+1)*binSize_x))
+        print(key_dict)
+        
+        for x in results:
+            key_r = math.ceil(x[0] / binSize_x)*binSize_x
+            key_l = math.floor(x[0] / binSize_x)*binSize_x
+            key = ((key_l,key_r),x[1])
+            if(key in ans_cols):
+                ans_cols[key]+=1
+            else:
+                ans_cols[key]=1
+        
+        print(ans_cols)
+        data={}
+        data_bar=[]
+        data_pie=[]    
+        col_2=set()
+        
+        
+        for x in results:
+            col_2.add(x[1])
+        
+        sum_dict={}
+        for x in key_dict:
+            data_col={}
+            data_col_pie={}
+            data_col["Name"]=str(x)
+            data_col_pie["Name"]=str(x)
+            count=0
+            for y in col_2:
+                if((x,y) in ans_cols):
+                    count+=ans_cols[(x,y)]
+                    data_col[y]=ans_cols[(x,y)]
+                else:
+                    count+=0
+                    data_col[y]=0
+                     
+            sum_dict[x]=count
+            for y in col_2:
+                if((x,y) in ans_cols ):       
+                    data_col[y]=ans_cols[(x,y)]
+                    data_col_pie[y]=round(ans_cols[(x,y)]*100/sum_dict[x],2)
+                else:
+                    data_col[y]=0
+                    data_col_pie[y]=0
+                    
+            data_bar.append(data_col)
+            data_pie.append(data_col_pie)
+        data["bar"]=data_bar
+        data["pie"]=data_pie
+            
+            
+        return data
+    
+    elif(attrType_x == "categorical" and attrType_y == "binning" ):
+        
+        
+        dataSQL = "SELECT [" + columnName_x + "],["+ columnName_y +  "] from GSE13355.dbo." + tableName 
+        cursor.execute(dataSQL)
+        results = cursor.fetchall()
+        print(attrType_x,attrType_y)    
+        result_y = []
+        
+        ans_cols={}
+        
+        for y in results:
+            result_y.append(y[1])
+            
+            
+        minVal = min(result_y)
+        maxVal = max(result_y)
+        print(minVal)
+        print(maxVal)
+        
+        modified_min = math.floor(minVal)
+        modified_max = math.ceil(maxVal)
+        
+        totalPos = math.ceil(modified_max / binSize_y)
+        totalNeg = math.floor(modified_min / binSize_y)
+        
+        key_dict=set()
+        for i in range(totalNeg,totalPos,1):
+            key_dict.add((i*binSize_y,(i+1)*binSize_y))
+        print(key_dict)
+        
+        for x in results:
+            key_r = math.ceil(x[1] / binSize_y)*binSize_y
+            key_l = math.floor(x[1] / binSize_y)*binSize_y
+            key = (x[0],(key_l,key_r))
+            if(key in ans_cols):
+                ans_cols[key]+=1
+            else:
+                ans_cols[key]=1
+        
+        print(ans_cols)
+        data={}
+        data_bar=[]
+        data_pie=[]    
+        col_2=set()
+        
+        
+        for x in results:
+            col_2.add(x[0])
+        
+        sum_dict={}
+        for x in col_2:
+            data_col={}
+            data_col_pie={}
+            data_col["Name"]=x
+            data_col_pie["Name"]=x
+            count=0
+            for y in key_dict:
+                if((x,y) in ans_cols):
+                    count+=ans_cols[(x,y)]
+                    data_col[y] = ans_cols[(x,y)]
+                else:
+                    count+=0
+                    data_col[y]=0
+                     
+            sum_dict[x]=count
+            for y in key_dict:
+                if((x,y) in ans_cols ):       
+                    data_col[y]=ans_cols[(x,y)]
+                    data_col_pie[y]=round(ans_cols[(x,y)]*100/sum_dict[x],2)
+                else:
+                    data_col[y]=0
+                    data_col_pie[y]=0
+                    
+            data_bar.append(data_col)
+            data_pie.append(data_col_pie)
+        data["bar"]=data_bar
+        data["pie"]=data_pie
+            
+            
+        return data
+    elif(attrType_x == "numerical" and attrType_y == "binning" ):
+        data={} 
+    else:
+        data={}
+        
+   
+    
+    
+    
+    
+    return data

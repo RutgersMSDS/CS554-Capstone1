@@ -37,7 +37,10 @@ def get_plot_data(request):
         attrType_y = incoming_data["columns"][1]["columnType"]
         columnName_y = incoming_data["columns"][1]["columnName"]
         
-        res = hp.get_bivariate_data(attrType_x, attrType_y, columnName_x,columnName_y, tableName)
+        if(incoming_data["columns"][0]["isBinningRequired"] or incoming_data["columns"][1]["isBinningRequired"] ):
+            res = bh.get_bivariate_binned_data(incoming_data["columns"],incoming_data["tableName"])
+        else:
+            res = hp.get_bivariate_data(attrType_x, attrType_y, columnName_x,columnName_y, tableName)
         return JsonResponse(res)
     
     return JsonResponse("")
