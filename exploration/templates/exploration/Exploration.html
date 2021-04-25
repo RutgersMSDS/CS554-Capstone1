@@ -215,9 +215,7 @@
 						var chartDiv = document.getElementById("chartdiv");
 						chartDiv.innerHTML = "";
 						var data = JSON.parse(xhttp.responseText);
-						console.log(data);
-						console.log(columns[0]["isBinningRequired"]);
-
+						
 						if(analysisType == "univariate" && type == "bar" && columns[0]["columnType"] == "categorical"){
 							renderAMCharts("univariate_bar", data);
 						}else if(analysisType == "univariate" && type == "pie" && columns[0]["columnType"] == "categorical"){
@@ -233,9 +231,15 @@
 						}
 						else if(columns[0]["isBinningRequired"] || columns[1]["isBinningRequired"])
 						{
+						console.log("REached2");
 							if(columns[0]["isBinningRequired"] && columns[1]["isBinningRequired"])
 							{
-								x=0
+								if(analysisType == "bivariate" && type == "bar" && (columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "numerical") ){
+									renderAMCharts("bivariate_bar_segment", data["bar"]);
+									console.log("REached1");
+								}else if(analysisType == "bivariate" && type == "pie" && (columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "numerical") ){
+									renderAMCharts("bivariate_pie_segment", data["pie"]);
+								}
 							}
 							else if(columns[0]["isBinningRequired"] )
 							{
@@ -243,6 +247,10 @@
 									renderAMCharts("bivariate_bar_segment", data["bar"]);
 								}else if(analysisType == "bivariate" && type == "pie" && (columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "categorical") ){
 									renderAMCharts("bivariate_pie_segment", data["pie"]);
+								}else if(analysisType == "bivariate" && type == "bar" && (columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "numerical") ){
+									renderAMCharts("bivariate_bar_pareto", data["bar"]);
+								}else if(analysisType == "bivariate" && type == "pie" && (columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "numerical") ){
+									renderAMCharts("bivariate_pie_interval", data["pie"]);
 								}
 							}
 							else if(columns[1]["isBinningRequired"] )
@@ -251,6 +259,10 @@
 									renderAMCharts("bivariate_bar_segment", data["bar"]);
 								}else if(analysisType == "bivariate" && type == "pie" && (columns[0]["columnType"] == "categorical" && columns[1]["columnType"] == "numerical") ){
 									renderAMCharts("bivariate_pie_segment", data["pie"]);
+								}else if(analysisType == "bivariate" && type == "bar" && (columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "numerical") ){
+									renderAMCharts("bivariate_bar_pareto", data["bar"]);
+								}else if(analysisType == "bivariate" && type == "pie" && (columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "numerical") ){
+									renderAMCharts("bivariate_pie_interval", data["pie"]);
 								}
 							}
 						}
