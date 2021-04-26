@@ -121,6 +121,32 @@
 		  width: 100%;
 		  height: 430px;
 		}
+		fieldset {
+			background-color: white;
+			
+			border: solid; 
+			border-width:2px;  
+			border-color: gray;
+			padding: 5px 5px;
+			margin-left:10px;
+			margin-top:2px;
+		}
+		.plotting{
+		border: solid; 
+			border-width:2px; 
+			border-color: gray;
+		}
+		
+		legend {
+		    background-color: white;
+		    font-size: 15px;
+			border: solid; 
+			border-width:2px; 
+			border-color: gray;
+		  color: black;
+		  padding: 2px 2px;
+		  width:inherit;
+		}
 	</style>
 	<script type="text/javascript">
 		var data = JSON.parse('{{res|safe}}');
@@ -816,6 +842,7 @@
 
 <div class="row tab-content">
 	<div id="data_exploration" class="col-md-4" style="float:left">
+		<br>
 		<div id="fact_table" class="data-exploration-elements" >
 			<span id="helpBlock" class="help-block" style="float:left"> Fact Table: &nbsp </span>
 			<div class="dropdown" style="width: 67.5%; float:left">
@@ -828,6 +855,10 @@
 				<div class="checkmark_kick"></div>
 			</span>
 		</div>
+		<br>
+		<fieldset>
+		
+		<legend>Variables:</legend>
 		
 		<div id="variables" style="clear:left; float:left" class="data-exploration-elements">
 			<div id="var_x">
@@ -868,10 +899,14 @@
 				</div>
 			</div>
 		</div>
+		</fieldset>
 		
+		<fieldset>
+		
+		<legend>Filters:</legend>
 		<div id="filters" style="clear:left" class="data-exploration-elements">
 		</div>
-		
+		</fieldset>
 		<div id="generate_graph_section" style="clear:left; float:left; padding-top:10px; margin-left:79%;">
 			<img src="static/images/chart-bar-24.png" style="height:25px;width:25px" onclick="plot_chart('bar')"></img>
 			<img src="static/images/chart-pie-24.png" style="margin-left:15px;height:25px;width:25px" onclick="plot_chart('pie')"></img>
