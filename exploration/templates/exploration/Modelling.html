@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bioada</title>
+    <link href="static/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="static/jquery/jquery.min.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link href="static/Custom.css" rel="stylesheet">
+    <script src="static/Custom.js"></script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+</head>
+<body style = 'margin-left:4vw;background-color:#F8F8FF'>
+
+    <div class="row" style = 'font-size:105%; margin-top: 2vw;'>
+        <p>
+            <label style="text-decoration: underline;">Trainset</label>
+            <input width ='5vw' type ='file' />
+            
+        </p>
+    </div>
+    <div class="row" style = 'font-size:105%;'>
+        <p>
+           <label style="text-decoration: underline;">Testset</label>
+           <input width ='5vw' type ='file' onchange="user_params()"/>
+         </p>
+    </div>
+    <div class="row" style = 'font-size:105%; '>
+        <p id ='first_dropdown'>
+{#            <label for="target" id ='first_dropdown' style="margin-right: 0.5vw;">Target:</label>#}
+{#                <select name="target" id="target" style="margin-right: 2vw;">#}
+{#                        <option value="target_factor">target_factor</option>#}
+{#                        <option value="GSM106817">GSM106817</option>#}
+{#                        <option value="Random">Random</option>#}
+{#                        <option value="Random_bin">Random_bin</option>#}
+{#                        <option value="Age">Age</option>#}
+{#                </select>#}
+
+
+
+            <label for="Values"style="margin-right: .5vw;">Values:</label>
+                <select name="Values" id="Values">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                </select>
+        </p>
+
+    </div>
+
+    <div class="row" style = 'font-size:105% ;margin-top: 3vw'>
+
+        <div class="col-xl-6" >
+            <div class="row">
+                <p>
+                <label>
+                    <input type ='checkbox' id="Input" onclick="SelectAll()"/> Inputs
+                </label>
+                <button style="font-size:20px;margin-left:6vw;"><i class="bx bxs-folder"></i></button>
+                <button style="font-size:24px;margin-left:1vw;"><i class="bx bxs-save"></i></button>
+                </p>
+            </div>
+            <hr/>
+            <div class ='row' style="height:5vw" >
+                <div class="col-xl-6" id="input_checklist" style="border: 1px solid black;margin-left:1vw;overflow-y: scroll;">
+{#                <div style="border: 1px solid black;">#}
+{#                        <label><input type ='checkbox' class="checkitem"> MIMAT0231 </label>#}
+{##}
+{#                        <label>#}
+{#                            <input type ='checkbox' class="checkitem"> MIMAT0232#}
+{#                        </label>#}
+{##}
+{#                        <label>#}
+{#                            <input type ='checkbox' class="checkitem"> MIMAT0233#}
+{#                        </label>#}
+{#                        <label>#}
+{#                            <input type ='checkbox' class="checkitem"> MIMAT0234#}
+{#                        </label>#}
+{##}
+{#                        <label>#}
+{#                            <input type ='checkbox' class="checkitem"> MIMAT0233#}
+{#                        </label>#}
+{##}
+{#                        <label>#}
+{#                            <input type ='checkbox' class="checkitem"> MIMAT0234#}
+{#                        </label>#}
+{##}
+{#                        <label>#}
+{#                            <input type ='checkbox' class="checkitem"> MIMAT0233#}
+{#                        </label>#}
+{##}
+{#                        <label>#}
+{#                            <input type ='checkbox' class="checkitem"> MIMAT0234#}
+{#                        </label>#}
+{##}
+{##}
+{#                            <label>#}
+{#                                <input type ='checkbox' class="checkitem"> target_factor#}
+{#                            </label>#}
+{##}
+{##}
+{#                            <label>#}
+{#                                <input type ='checkbox' class="checkitem"> Random#}
+{#                            </label>#}
+{#                            <label>#}
+{#                                <input type ='checkbox' class="checkitem"> RandomBin#}
+{#                            </label>#}
+{##}
+{#                        <div>#}
+{#                            <label>#}
+{#                                <input type ='checkbox' class="checkitem"> Age#}
+{#                            </label>#}
+{#                        </div>#}
+{##}
+{#               </div>#}
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-6">
+            <p> CLassification</p>
+            <label>REgression</label>
+        </div>
+
+    </div>
+
+</body>
+</html>

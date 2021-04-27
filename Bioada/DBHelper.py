@@ -23,9 +23,9 @@ class DBConnection():
         server_url ='13.92.0.168'
         user_name = 'saedsayad'
         pwd = 'mordab1339235$'
-        db_name = 'GSE13355'
+        db_name = 'GEO'
         
-        conn = pymssql.connect(server = server_url, user = user_name, password = pwd, database = db_name)
+        conn = pymssql.connect(server = server_url, user = user_name, password = pwd, database = db_name, autocommit=True)
         self.cursor = conn.cursor()
 
 """

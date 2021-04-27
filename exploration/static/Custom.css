@@ -10,12 +10,140 @@
 .bx{
     line-height: 2;
 }
+
+.bx-md {
+    font-size: 1.5rem!important;
+}
+
 body{
     font-family: none;
     font-size: large;
 }
+a{
+     color: #428bca;;
+ }
+.HomeLogin {
+    position: relative;
+    left: 5vw;
+    top: 5vw;
+}
 
-/*.active a {*/
-/*    background-color: lavender !important;*/
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
 
+/* Style the buttons inside the tab */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+.table {
+    margin-left: 1.25vw;
+}
+/* Style the tab content */
+.close {
+  position: absolute;
+  right: 32px;
+  top: -1vw;
+  width: 32px;
+  height: 32px;
+  opacity: 0.3;
+}
+.close:hover {
+  opacity: 1;
+}
+.close:before, .close:after {
+  position: absolute;
+  left: 15px;
+  content: ' ';
+  height: 33px;
+  width: 2px;
+  background-color: #333;
+}
+.close:before {
+  transform: rotate(45deg);
+}
+.close:after {
+  transform: rotate(-45deg);
+}
+
+.modal{
+    width:98%;
+}
+
+.context-menu{
+    position: fixed;
+    z-index: 10000;
+    width:6vw;
+    background: whitesmoke;
+
+}
+
+.context-menu .item{
+    padding: 8px 10px;
+    font-size: 15px;
+}
+
+.context-menu .item:hover {
+    background: #e0e0e0;
+}
+
+.context-menu .item i{
+    display: inline-block;
+    margin-right:5px;
+}
+
+.context-menu .item button {
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 0vw;
+    margin-left: 0.5vw;
+}
+
+
+/*.table-fixed tbody {*/
+/*    height: 300px;*/
+/*    overflow-y: auto;*/
+/*    width: 100%;*/
+/*}*/
+
+/*.table-fixed thead,*/
+/*.table-fixed tbody,*/
+/*.table-fixed tr,*/
+/*.table-fixed td,*/
+/*.table-fixed th {*/
+/*    display: block;*/
+/*}*/
+
+/*.table-fixed tbody td,*/
+/*.table-fixed tbody th,*/
+/*.table-fixed thead > tr > th {*/
+/*    float: left;*/
+/*    position: relative;*/
+
+/*    !*&::after {*!*/
+/*    !*    content: '';*!*/
+/*    !*    clear: both;*!*/
+/*    !*    display: block;*!*/
+/*    !*}*!*/
 /*}*/
