@@ -5,15 +5,17 @@ from django.template import RequestContext
 
 from exploration import load_fact_table_helper_SQL as ftable
 from exploration import helperPlot as hp
-import pandas as pd
-#Modelling imports
+
+#Modeling imports
 import pandas as pd
 from xgboost import XGBClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix, roc_curve
+
 import xgboost
 from sklearn.metrics import mean_absolute_error,\
  mean_squared_log_error,\
 mean_squared_error
+
 import math
 
 # response = ftable.gather_all_data()
