@@ -19,7 +19,7 @@ mean_squared_error
 import math
 
 # response = ftable.gather_all_data()
-# Modelling Code
+# modeling Code
 train_set = pd.DataFrame()
 test_set = pd.DataFrame()
 
@@ -124,13 +124,13 @@ def GetDatafromDB(request):
     response.append(selectquery)
     return JsonResponse(response,safe=False)
 
-# MODELLING
+# modeling
 
-# def render_modelling(request):
+# def render_modeling(request):
 #     if request.method != 'POST':
 #         columns=[]
 #         values=[]
-#         return render(request, 'exploration/Modelling.html')
+#         return render(request, 'exploration/modeling.html')
 #     else:
 #         train_path = request.FILES['fileupload']
 #         test_path = request.FILES['fileupload1']
@@ -145,9 +145,9 @@ def GetDatafromDB(request):
 #         for col in columns:
 #             values.append(train_set[col].unique().astype(str))
 #
-#         return render(request, 'exploration/Modelling.html', {'columns' : columns, 'values' : values})
+#         return render(request, 'exploration/modeling.html', {'columns' : columns, 'values' : values})
 
-def render_modelling(request):
+def render_modeling(request):
     global train_set
     global test_set
     global train_path
@@ -155,7 +155,7 @@ def render_modelling(request):
     if request.method != 'POST':
         columns=[]
         values=[]
-        return render(request, 'exploration/Modelling.html')
+        return render(request, 'exploration/modeling.html')
     else:
         train_path = request.FILES['fileupload']
         test_path = request.FILES['fileupload1']
@@ -179,7 +179,7 @@ def render_modelling(request):
         for col in columns:
             values.append(train_set[col].unique().astype(str))
 
-        return render(request, 'exploration/Modelling.html', {'columns' : columns, 'values' : values, 'train_path': train_path, 'test_path':test_path})
+        return render(request, 'exploration/modeling.html', {'columns' : columns, 'values' : values, 'train_path': train_path, 'test_path':test_path})
 
 def dynamic_dropdown(request):
     colname = request.GET.get('col',None);

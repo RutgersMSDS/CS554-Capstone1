@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bioada</title>
+    <link href="static/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="static/jquery/jquery.min.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link href="static/Custom.css" rel="stylesheet">
+    <script src="static/Custom.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+</head>
+<body>
+    <div class="row" style="background:aliceblue;">
+        <ul class="nav nav-tabs">
+            <li><a href="" class="nav-item nav-link"><i class="bx bx-md bxs-home"></i>Home</a></li>
+            <li><a href="data" class="nav-item nav-link"><i class="bx bx-md bxs-data"></i>Data</a></li>
+            <li><a href="exploration" class="nav-item nav-link"><i class="bx bx-md bxs-bar-chart-alt-2"></i>Exploration</a></li>
+            <li><a href="modeling" class="nav-item nav-link active"><i class="bx bx-md bx-diamond"></i>Modeling</a></li>
+            <li><a href="../Evaluation.html" class="nav-item nav-link"><i class="bx bx-md bxs-wrench"></i>Evaluation</a></li>
+            <li><a href="../Deployment.html" class="nav-item nav-link"><i class="bx bx-md bxs-server"></i>Deployment</a></li>
+        </ul>
+    </div>
+    <form action="modeling" method="post" enctype="multipart/form-data"> {% csrf_token %}
+    <div class="row" style = 'margin-left:1vw;font-size:105%; margin-top: 2vw;'>
+        <p>
+            <label style="text-decoration: underline;cursor: pointer;" onclick="opentrain(event)">Trainset</label>
+            <input type="text" style="width: 45vw;" id="Trainpath" value="{{ train_path }}">
+            <input style="display: none;" type ='file' name="fileupload" id="fileToUpload" onchange="settraintext(event)"/>
+            
+        </p>
+    </div>
+    <div class="row" style = 'margin-left:1vw;font-size:105%;'>
+        <p>
+            <label style="text-decoration: underline;cursor: pointer;" onclick="opentest(event)">Testset</label>
+            <input type="text" style="width: 45vw;"  id="Testpath" value="{{ test_path }}">
+            <input  style="display: none;" type ='file' onchange="settesttext(event)" name="fileupload1" id="fileToUpload1"/>
+         </p>
+    </div>
+    <input type="submit" id="submit" style="display: none;">
+</form>
+    <div class="row">
+        <div class="col-xl-6 " >
+            <div class="row" style = 'margin-left:1vw;font-size:105%;height: 2vw; '>
+                <p id ='first_dropdown'>
+
+                    <label for="target" id ='first_dropdown' style="margin-right: 0.5vw;">Target:</label>
+                        <select name="target" id="target" onchange="getValues(event);" style="margin-right: 2vw;width: 14vw;">
+                            <option></option>
+
+                           {% if columns.length != 0 %}
+                               {%  for col in columns %}
+                                    <option value="{{col}}">{{ col }}</option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+
+                    <label for="Values"style="margin-right: .5vw;">Values:</label>
+                        <select name="Values" id="Values" style="width: 14vw;">
+                            <option></option>
+                             {% if values.length != 0 %}
+                               {%  for val in values %}
+                                    <option value="{{val}}">{{ val }}</option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                </p>
+
+            </div>
+            <div class="row" style = 'margin-left:1vw;font-size:105%;'>
+                <div>
+                <label>
+                    <input type ='checkbox' id="Input" onclick="SelectAll()"/> Inputs
+                </label>
+                    <i style="margin-left: 38vw;"><img src="/static/Images/open-folder-16.png" ></i>
+                    <i><img src="/static/Images/save16.png"></i>
+                </div>
+            </div>
+            <div class ='row' style="margin-left: 1vw;border: 1px solid black;overflow-y: auto;height: 28vw;" >
+                <div class="col-xl-6" id="input_checklist" style="">
+
+                    {% if columns.length != 0 %}
+                       {%  for col in columns %}
+                           <p>
+                            <input type="checkbox" class="checkitem" value="{{ col }}">
+                            <label>{{ col }}</label>
+                           </p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class=" col-xl-5" style="margin-left: 3vw;">
+            <div class="row nav-tabs">
+                <div class="nav-item" style="width: 5vw; text-align: center;  height: 2vw;">
+                    <label class="nav-link active">Model</label>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 0.3vw; background: aliceblue;">
+                <i style="margin-left: 2vw;cursor: pointer;"><img src="/static/Images/view-16.png"></i>
+                <i style="margin-left: 2vw;cursor: pointer;"><img src="/static/Images/column-16.png"></i>
+                <i onclick="model_generate()" style="margin-left: 2vw;cursor: pointer;"><img src="/static/Images/chart-bullseye-16.png" > Classification</i>
+                <i onClick="model_generate_reg()" style="margin-left: 2vw;cursor: pointer;"><img src="/static/Images/Line-chart-16.png"> Regression</i>
+            </div>
+            <div class="row" style="margin:0 auto;">
+                <div class="col-xl-6" style="text-align: right; margin-top: 1.2vw; display: inline-block;">
+                    <div>
+                        <label>num_class: </label>
+                        <input type="text" value="1" style=" width: 5vw;">
+                    </div>
+                    <div>
+                        <label>n_estimators: </label>
+                        <input type="text" value="100" style=" width: 5vw;">
+                    </div>
+                    <div>
+                        <label>max-depth: </label>
+                        <input type="text" value="6" style=" width: 5vw;">
+                    </div>
+                    <div>
+                        <label>learning_rate: </label>
+                        <input type="text" value="0.3" style=" width: 5vw;">
+                    </div>
+                    <div>
+                        <label>base_score: </label>
+                        <input type="text" value="0.5" style=" width: 5vw;">
+                    </div>
+                    <div>
+                        <label>colsample_bylevel: </label>
+                        <input type="text" value="1" style=" width: 5vw;">
+                    </div>
+                    <div>
+                        <label>colsample_bytree: </label>
+                        <input type="text" value="1" style=" width: 5vw;">
+                    </div>
+                    <div>
+                        <label>scale_pos_weight: </label>
+                        <input type="text" value="1" style=" width: 5vw;">
+                    </div>
+                    <div>
+                        <label>min_child_weight: </label>
+                        <input type="text" value="1" style=" width: 5vw;">
+                    </div>
+                </div>
+                <div class="col-xl-6" style="text-align: right; margin-top: 1.2vw; display: inline-block;margin-left: -3vw;">
+                    <div>
+                        <label>missing: </label>
+                        <input type="text" value="NaN" disabled style=" width: 5vw;">
+                    </div>
+                    <div>
+                        <label>reg_alpha: </label>
+                        <input type="text" value="0" style=" width: 5vw;">
+                    </div>
+                    <div>
+                        <label>reg_lambda: </label>
+                        <input type="text" value="0" style=" width: 5vw;">
+                    </div>
+                    <div>
+                        <label>gamma: </label>
+                        <input type="text" value="0" style=" width: 5vw;">
+                    </div>
+                    <div>
+                        <label>subsample: </label>
+                        <input type="text" value="1" style=" width: 5vw;">
+                    </div>
+                    <div>
+                        <label>max_delta_step: </label>
+                        <input type="text" value="0" style=" width: 5vw;">
+                    </div>
+                    <div>
+                        <label>silent: </label>
+                        <input type="text" value="True" disabled style=" width: 5vw;">
+                    </div>
+                    <div>
+                        <label>nthread: </label>
+                        <input type="text" value="-1" style=" width: 5vw;">
+                    </div>
+                    <div>
+                        <label>seed: </label>
+                        <input type="text" value="0" style=" width: 5vw;">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <textarea style="width: 42vw;height:5.1vw;"></textarea>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

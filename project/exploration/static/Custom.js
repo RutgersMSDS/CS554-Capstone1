@@ -1,33 +1,31 @@
 document.oncontextmenu = rightClick;
-var currentGSE=''
+var currentGSE = ''
+
 function openNotes(evt, notetype) {
-          var i, tablinks;
-          tablinks = document.getElementsByClassName("tablinks");
-          for (i = 0; i < tablinks.length; i++) {
-            tablinks[i].className = tablinks[i].className.replace(" active", "");          }
-          evt.currentTarget.className += " active";
-          PublicNotes = document.getElementById('Public');
-          PrivateNotes= document.getElementById('Private');
-          if(notetype=="Public"){
-              PublicNotes.style.display="block";
-              PrivateNotes.style.display="none";
-          }
-          else {
-              PublicNotes.style.display="none";
-              PrivateNotes.style.display="block";
-          }
-        }
+    var i, tablinks;
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    evt.currentTarget.className += " active";
+    PublicNotes = document.getElementById('Public');
+    PrivateNotes = document.getElementById('Private');
+    if (notetype == "Public") {
+        PublicNotes.style.display = "block";
+        PrivateNotes.style.display = "none";
+    } else {
+        PublicNotes.style.display = "none";
+        PrivateNotes.style.display = "block";
+    }
+}
 
 function SelectAll() {
     var checkboxes = document.getElementsByClassName('checkitem');
-    for (box of checkboxes){
-        if(box.checked)
-        {
-            box.checked="False"
-        }
-        else
-        {
-            box.checked="True"
+    for (box of checkboxes) {
+        if (box.checked) {
+            box.checked = "False"
+        } else {
+            box.checked = "True"
         }
 
     }
@@ -38,12 +36,12 @@ function LoadData() {
     $.ajax({
         url: '/GetGSEData',
         data: {
-          'type': 'render'
+            'type': 'render'
         },
         dataType: 'json',
         success: function (response) {
             var arrHead = new Array();
-            arrHead = ['GSE', 'Year', 'Subject', 'Organ', 'Source','Samples','Assay','Platform','Title'];
+            arrHead = ['GSE', 'Year', 'Subject', 'Organ', 'Source', 'Samples', 'Assay', 'Platform', 'Title'];
             var empTable = document.createElement('table');
             empTable.setAttribute('id', 'GSEData');  // table id.
             empTable.setAttribute('class', 'table table-bordered table-hover table-sm w-75');
@@ -63,31 +61,30 @@ function LoadData() {
 
             var rowCnt = empTable.rows.length;    // get the number of rows.
 
-            for (var i=0; i<response.length; i++){
+            for (var i = 0; i < response.length; i++) {
                 row = response[i]
                 var tr = empTable.insertRow(rowCnt); // table row.
-                tr.setAttribute('id',row[arrHead[0]])
+                tr.setAttribute('id', row[arrHead[0]])
                 // tr.addEventdictener(oncontextmenu,rightClick($('tr')))
 
                 for (var c = 0; c < Object.keys(row).length; c++) {
                     var td = document.createElement('td');          // TABLE DEFINITION.
                     td = tr.insertCell(c);
-                    if (row[arrHead[c]] != null){
+                    if (row[arrHead[c]] != null) {
                         td.append(row[arrHead[c]])
-                    }
-                    else{
+                    } else {
                         td.append('')
                     }
 
                 }
-                tr.addEventListener("contextmenu",function(event){
-                      event.preventDefault();
-                      currentGSE = event.currentTarget.id;
-                      localStorage.setItem( 'objectToPass', currentGSE );
-                      var contextElement = document.getElementById("contextMenu");
-                      contextElement.style.top = event.offsetY + "px";
-                      contextElement.style.left = event.offsetX + "px";
-                    });
+                tr.addEventListener("contextmenu", function (event) {
+                    event.preventDefault();
+                    currentGSE = event.currentTarget.id;
+                    localStorage.setItem('objectToPass', currentGSE);
+                    var contextElement = document.getElementById("contextMenu");
+                    contextElement.style.top = event.offsetY + "px";
+                    contextElement.style.left = event.offsetX + "px";
+                });
             }
 
         }
@@ -96,11 +93,11 @@ function LoadData() {
 
 function setGSE() {
     $('#contextMenu').css('display', 'none');
-    value= localStorage['objectToPass'];
+    value = localStorage['objectToPass'];
     $.ajax({
         url: '/GetGSEData',
         data: {
-          'type': value
+            'type': value
         },
         dataType: 'json',
         success: function (response) {
@@ -119,8 +116,8 @@ function setGSE() {
             $('#Private').val(details['Private_Notes']);
         }
     });
-    $('#myModal').css('display','block');
-    localStorage.removeItem( 'objectToPass' );
+    $('#myModal').css('display', 'block');
+    localStorage.removeItem('objectToPass');
 }
 
 
@@ -132,15 +129,16 @@ function rightClick(e) {
     menu.style.top = e.pageY + "px";
     // return false;
 }
+
 function deletegse(event) {
     event.preventDefault();
-    var gse= document.getElementById("GSE").value;
+    var gse = document.getElementById("GSE").value;
     // urls = "{% url 'DeleteGSE' GSE="+gse+" %}";
     $.ajax({
         url: "/DeleteGSE",
         type: "GET",
         // url : urls,
-        data:{
+        data: {
             GSE: gse
         },
         success: function (response) {
@@ -149,8 +147,8 @@ function deletegse(event) {
     });
 }
 
-function savedata(){
-    dict={}
+function savedata() {
+    dict = {}
     var gse = document.getElementById("GSE").value;
     dict['GSE'] = gse;
     var years = document.getElementById("Year").value;
@@ -170,56 +168,56 @@ function savedata(){
     var prnotes = document.getElementById("Private").value;
     dict['Private'] = prnotes;
     var source = document.getElementById("Source");
-    var sourcetext= source.options[source.options.selectedIndex].text;
+    var sourcetext = source.options[source.options.selectedIndex].text;
     dict['Source'] = sourcetext;
     var organ = document.getElementById("Organ");
-    var organtext= organ.options[organ.options.selectedIndex].text;
+    var organtext = organ.options[organ.options.selectedIndex].text;
     dict['Organ'] = organtext;
     var assay = document.getElementById("Assay");
-    var assaytext= assay.options[assay.options.selectedIndex].text;
+    var assaytext = assay.options[assay.options.selectedIndex].text;
     dict['Assay'] = assaytext;
 
     $.ajax({
         url: "/SaveGSEData",
         dataType: 'json',
         data: {
-            data : dict
+            data: dict
         },
         success: function (response) {
-           $('#Cancel').click()
+            $('#Cancel').click()
         }
 
     });
 }
 
-function getDatafromDB(event){
+function getDatafromDB(event) {
     var gsevalue = localStorage['objectToPass'];
     var tablename = event.currentTarget.id;
     $.ajax({
         url: '/GetDatafromDB',
-        data:{
+        data: {
             GSE: gsevalue,
-            table:tablename
+            table: tablename
         },
         success: function (response) {
             $('#selectquery').val(response[2])
-            cols= response[1]
-            rows= response[0]
-            BuildTable(cols,rows)
+            cols = response[1]
+            rows = response[0]
+            BuildTable(cols, rows)
         }
     });
 }
 
-function  BuildTable(columns, rows) {
+function BuildTable(columns, rows) {
     var div = document.getElementById('Database');
-    if(div.childElementCount>0){
-       div.querySelectorAll('*').forEach(n => n.remove());
+    if (div.childElementCount > 0) {
+        div.querySelectorAll('*').forEach(n => n.remove());
     }
 
-    var table= document.createElement('Table');
+    var table = document.createElement('Table');
     table.id = 'DBTable'
-    table.className='table table-bordered table-hover w-50'
-    table.style.marginLeft='0px !important'
+    table.className = 'table table-bordered table-hover w-50'
+    table.style.marginLeft = '0px !important'
     var tr = table.insertRow(-1);
 
     $.each(columns, function (i, value) {
@@ -233,7 +231,7 @@ function  BuildTable(columns, rows) {
 
     $.each(rows, function (i, row) {
         var tr = table.insertRow(rowCnt);
-        $.each(row, function(i,value){
+        $.each(row, function (i, value) {
             var td = document.createElement('td');          // TABLE DEFINITION.
             td = tr.insertCell(i);
             td.append(value)
@@ -241,90 +239,79 @@ function  BuildTable(columns, rows) {
     });
 
     div.appendChild(table);
-    $('#DBCont').css('display','block');
+    $('#DBCont').css('display', 'block');
     $('#contextMenu').css('display', 'none');
-    
+
 
 }
 
-
- //Modelling
+// Modeling
 function SelectAll() {
     var checkboxes = document.getElementsByClassName('checkitem');
-    for (box of checkboxes){
-        if(box.checked)
-        {
-            box.checked=false
-        }
-        else
-        {
-            box.checked=true
+    for (box of checkboxes) {
+        if (box.checked) {
+            box.checked = false
+        } else {
+            box.checked = true
         }
     }
 }
 
 function getValues(event) {
 
-            var colname = event.currentTarget.value;
+    var colname = event.currentTarget.value;
 
+    var select = document.getElementById('Values')
+    // var select = document.getElementById("DropList")
+    var options = select;
+    for (i = options.length - 1; i >= 1; i--) {
+        select.removeChild(options[i])
+    }
+
+
+    $.ajax({
+        url: '/dynamic_dropdown',
+        data: {
+            'col': colname
+        },
+        dataType: 'json',
+        success: function (response) {
+            var colvalues = response;
             var select = document.getElementById('Values')
-            // var select = document.getElementById("DropList")
-            var options = select;
-            for (i = options.length-1; i >= 1; i--) {
-              select.removeChild(options[i])
+            for (i = 0; i < colvalues.length; i++) {
+                var option = document.createElement('option')
+                option.setAttribute('value', colvalues[i])
+                option.text = colvalues[i]
+                select.appendChild(option)
             }
+        }
+    });
+}
 
-
-            $.ajax({
-                url: '/dynamic_dropdown',
-                data: {
-                  'col':colname
-                 },
-                dataType: 'json',
-                success: function (response) {
-                       var colvalues = response;
-                       var select = document.getElementById('Values')
-                       for (i=0; i<colvalues.length;i++) {
-                           var option = document.createElement('option')
-                           option.setAttribute('value', colvalues[i])
-                           option.text = colvalues[i]
-                           select.appendChild(option)
-                       }
-
-
-                }
-            });
-
-
-        };
-
-
-
-function model_generate(){
+function model_generate() {
 
     var target = document.getElementById('target')
-    var out =  target.options[target.selectedIndex].text;
+    var out = target.options[target.selectedIndex].text;
 
     var unchecked = []
     var inputs = document.querySelectorAll('.checkitem');
     for (var i = 0; i < inputs.length; i++) {
         if (inputs[i].checked == false) {
-                 unchecked.push(inputs[i].value)
+            unchecked.push(inputs[i].value)
         }
     }
     $.ajax({
         url: '/get_model_params',
         data: {
-            'y':out,
-            'x' :unchecked
-         },
+            'y': out,
+            'x': unchecked
+        },
         dataType: 'json',
         success: function (response) {
-               alert('Accuracy = '+response*100 +'%')
+            alert('Accuracy = ' + response * 100 + '%')
 
         }
     });
-
 }
 
 function model_generate_reg() {
@@ -354,19 +341,19 @@ function model_generate_reg() {
 
 }
 
-function opentrain(event){
+function opentrain(event) {
     $('#fileToUpload').click();
 }
 
-function opentest(event){
+function opentest(event) {
     $('#fileToUpload1').click()
 }
 
-function settraintext(event){
+function settraintext(event) {
     $('#Trainpath').val(event.currentTarget.files[0].name);
 }
 
-function settesttext(event){
+function settesttext(event) {
     $('#Testpath').val(event.currentTarget.files[0].name);
     $('#submit').click()
     // event.currentTarget.parentElement
