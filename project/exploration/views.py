@@ -1,15 +1,13 @@
 from django.shortcuts import render
 import json
-
 from django.http import JsonResponse
-from django.template import RequestContext
 
 from . import load_fact_table_helper_SQL as ftable
 from . import helperPlot as hp
+from . import binningHelper as bh
 
 response = ftable.gather_all_data()
 
-# Create your views here.
 def render_exploration(request):
     json_string = json.dumps(response)
     return render(request, 'exploration/Exploration.html', {"res" : json_string})
@@ -22,8 +20,14 @@ def get_plot_data(request):
         tableName = incoming_data["tableName"]
         attrType = incoming_data["columns"][0]["columnType"]
         columnName = incoming_data["columns"][0]["columnName"]
+        chartType = incoming_data["chartType"]
         
-        res = hp.get_univariate_data(attrType, columnName, tableName)
+        if(incoming_data["columns"][0]["isBinningRequired"]):
+            binSize = int(incoming_data["columns"][0]["binningSize"])
+            res = bh.get_univariate_binned_data(attrType, columnName, tableName, binSize)
+        else:
+            res = hp.get_univariate_data(attrType, columnName, tableName, chartType)
+            
         return JsonResponse(res)
 
     else:
@@ -33,7 +37,7 @@ def get_plot_data(request):
         attrType_y = incoming_data["columns"][1]["columnType"]
         columnName_y = incoming_data["columns"][1]["columnName"]
         
-        res = hp.get_bivariate_data(attrType_x,attrType_y, columnName_x,columnName_y, tableName)
+        res = hp.get_bivariate_data(attrType_x, attrType_y, columnName_x,columnName_y, tableName)
         return JsonResponse(res)
     
     return JsonResponse("")

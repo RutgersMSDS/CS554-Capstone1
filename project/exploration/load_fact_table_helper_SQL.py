@@ -1,7 +1,9 @@
-import pymssql
-
 from Bioada import DBHelper as db_con
-cursor = db_con.DBConnection.Instance().cursor
+from django.http import JsonResponse
+
+conn= db_con.DBConnection.Instance()
+cursor = conn.cursor
+
 
 def get_datatype(table_name):
     dataTypeSQL = "SELECT DATA_TYPE, COLUMN_NAME FROM [GSE13355].[INFORMATION_SCHEMA].[COLUMNS] WHERE TABLE_NAME = '" + table_name + "'"
@@ -69,3 +71,73 @@ def gather_all_data():
         }
 
     return res
+
+def getdata():
+    tableSQL = "SELECT [GSE],[SubmissionYear],[Subject],[Organ],[Source],[Samples],[Assay],[Platform],[Title] FROM [GEO].[dbo].[DeepDive] where IsActive=1"
+    cursor.execute(tableSQL)
+    data = cursor.fetchall()
+    rows=[]
+    for row in data:
+        singlerow={}
+        singlerow['GSE'] = row[0]
+        singlerow['SubmissionYear'] = row[1]
+        singlerow['Subject'] = row[2]
+        singlerow['Organ'] = row[3]
+        singlerow['Source'] = row[4]
+        singlerow['Samples'] = row[5]
+        singlerow['Assay'] = row[6]
+        singlerow['Platform'] = row[7]
+        singlerow['Title'] = row[8]
+        rows.append(singlerow)
+    return rows
+
+def DeleteGSE(gsevalue):
+    query2 = "drop database if exists {}".format(gsevalue);
+    cursor.execute(query2)
+    SQLquery = "Update [GEO].[dbo].[DeepDive] set IsActive =0 where GSE='" + str(gsevalue) + "';";
+    cursor.execute(SQLquery)
+    desc= cursor.description
+    return desc
+
+
+def SaveGSEData(dict):
+    Querytxt = "Update [GEO].[dbo].[DeepDive] " + \
+               "set GSE = '" + dict['GSE'] + "'," + \
+                "SubmissionYear = '"+dict['Year']+"', " + \
+                "Samples = '" + dict['Samples'] + "'," + \
+                "Subject = '" + dict['Subject'] + "'," + \
+                "Platform = '" + dict['Platform'] + "'," + \
+                "Title = '" + dict['Title'] + "'," + \
+                "URL = '" + dict['URL'] + "'," + \
+                "Notes = '" + dict['Public'] + "'," + \
+                "Source = '" + dict['Source'] + "'," + \
+                "Organ = '" + dict['Organ'] + "'," + \
+                "Assay = '" + dict['Assay'] + "'," +\
+                "ProbeType='R'," +\
+                "IsActive=1 " + \
+    "where GSE='" + dict['GSE'] + "';"
+    cursor.execute(Querytxt)
+    # conn.commit()
+    desc = cursor.rowcount
+    return desc
+
+def GetTargets(GSEValue,tablename):
+    if tablename == 'Targets':
+        tablename = "[" + GSEValue + "].[dbo].[" + GSEValue + "_targets]";
+        columnquery = "SELECT COLUMN_NAME FROM [" + GSEValue + "].[INFORMATION_SCHEMA].[COLUMNS] WHERE TABLE_NAME = '" + GSEValue + "_targets'";
+    elif tablename == 'Probes':
+        tablename = "[" + GSEValue + "].[dbo].[" + GSEValue + "_probes]";
+        columnquery = "SELECT COLUMN_NAME FROM [" + GSEValue + "].[INFORMATION_SCHEMA].[COLUMNS] WHERE TABLE_NAME = '" + GSEValue + "_probes'";
+    else:
+        tablename = "[" + GSEValue + "].[dbo].[slice_001_fact]";
+        columnquery = "SELECT TOP 50 COLUMN_NAME FROM [" + GSEValue + "].[INFORMATION_SCHEMA].[COLUMNS] WHERE TABLE_NAME = 'slice_001_fact'";
+
+    SQLQuery = "select * from " + tablename;
+    cursor.execute(SQLQuery)
+    result = cursor.fetchall()
+    cursor.execute(columnquery)
+    columns= cursor.fetchall()
+    return result,columns
+
+
+

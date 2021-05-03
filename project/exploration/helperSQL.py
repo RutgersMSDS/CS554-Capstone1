@@ -1,6 +1,5 @@
-import pymssql
-
 from Bioada import DBHelper as db_con
+
 cursor = db_con.DBConnection.Instance().cursor
 
 def get_datatype(table_name):
