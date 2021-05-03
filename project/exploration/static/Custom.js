@@ -37,9 +37,9 @@ function LoadData() {
     // var data = $('GSEData');
     $.ajax({
         url: '/GetGSEData',
-        // data: {
-        //   'username': username
-        // },
+        data: {
+          'type': 'render'
+        },
         dataType: 'json',
         success: function (response) {
             var arrHead = new Array();
@@ -72,7 +72,13 @@ function LoadData() {
                 for (var c = 0; c < Object.keys(row).length; c++) {
                     var td = document.createElement('td');          // TABLE DEFINITION.
                     td = tr.insertCell(c);
-                    td.append(row[arrHead[c]])
+                    if (row[arrHead[c]] != null){
+                        td.append(row[arrHead[c]])
+                    }
+                    else{
+                        td.append('')
+                    }
+
                 }
                 tr.addEventListener("contextmenu",function(event){
                       event.preventDefault();
@@ -90,8 +96,30 @@ function LoadData() {
 
 function setGSE() {
     $('#contextMenu').css('display', 'none');
+    value= localStorage['objectToPass'];
+    $.ajax({
+        url: '/GetGSEData',
+        data: {
+          'type': value
+        },
+        dataType: 'json',
+        success: function (response) {
+            var details = response[0]
+            $('#GSE').val(details['GSE']);
+            $('#Year').val(details['Year']);
+            $('#Subject').val(details['Subject']);
+            $('#Organ').val(details['Organ']).attr('selected', 'selected');
+            $('#Source').val(details['Source']).attr('selected', 'selected');
+            $('#Samples').val(details['Samples']);
+            $('#Assay').val(details['Assay']).attr('selected', 'selected');
+            $('#Platform').val(details['Platform']);
+            $('#Title').val(details['Title']);
+            $('#URL').val(details['URL']);
+            $('#Public').val(details['Public_Notes']);
+            $('#Private').val(details['Private_Notes']);
+        }
+    });
     $('#myModal').css('display','block');
-    $('#GSE').val(localStorage['objectToPass']);
     localStorage.removeItem( 'objectToPass' );
 }
 
@@ -215,8 +243,25 @@ function  BuildTable(columns, rows) {
     div.appendChild(table);
     $('#DBCont').css('display','block');
     $('#contextMenu').css('display', 'none');
-    $('body').css('opacity','0.2')
+    
 
 }
 
+function opentrain(event){
+    $('#fileToUpload').click();
+}
+
+function opentest(event){
+    $('#fileToUpload1').click()
+}
+
+function settraintext(event){
+    $('#Trainpath').val(event.currentTarget.files[0].name);
+}
+
+function settesttext(event){
+    $('#Testpath').val(event.currentTarget.files[0].name);
+    $('#submit').click()
+    // event.currentTarget.parentElement
+}
 

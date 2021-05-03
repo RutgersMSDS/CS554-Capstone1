@@ -72,15 +72,21 @@ def gather_all_data():
 
     return res
 
-def getdata():
-    tableSQL = "SELECT [GSE],[SubmissionYear],[Subject],[Organ],[Source],[Samples],[Assay],[Platform],[Title] FROM [GEO].[dbo].[DeepDive] where IsActive=1"
+def getdata(type):
+    if(type == 'render'):
+        tableSQL = "SELECT [GSE],[SubmissionYear],[Subject],[Organ],[Source],[Samples],[Assay],[Platform],[Title] FROM [GEO].[dbo].[DeepDive] where IsActive=1"
+    else:
+        tableSQL = "select DD.GSE,[SubmissionYear],[Subject],[Organ],[Source],[Samples],[Assay],[Platform],[Title] " +\
+                  ",URL,DD.Notes as 'Public Notes',DDN.Notes as 'Private Notes' " +\
+                  "from [GEO].[dbo].[DeepDive] DD left outer join [GEO].[dbo].[DeepDiveNotes] DDN on DD.GSE=DDN.GSE " +\
+                  "where DD.GSE='" + type + "'"
     cursor.execute(tableSQL)
     data = cursor.fetchall()
     rows=[]
     for row in data:
         singlerow={}
         singlerow['GSE'] = row[0]
-        singlerow['SubmissionYear'] = row[1]
+        singlerow['Year'] = row[1]
         singlerow['Subject'] = row[2]
         singlerow['Organ'] = row[3]
         singlerow['Source'] = row[4]
@@ -88,6 +94,10 @@ def getdata():
         singlerow['Assay'] = row[6]
         singlerow['Platform'] = row[7]
         singlerow['Title'] = row[8]
+        if(type != 'render'):
+            singlerow['URL'] = row[9]
+            singlerow['Public_Notes'] = row[10]
+            singlerow['Private_Notes'] = row[11]
         rows.append(singlerow)
     return rows
 
@@ -117,6 +127,12 @@ def SaveGSEData(dict):
                 "IsActive=1 " + \
     "where GSE='" + dict['GSE'] + "';"
     cursor.execute(Querytxt)
+    privateQuery = "IF EXISTS (SELECT * FROM [GEO].[dbo].[DeepDiveNotes] WHERE GSE ='" + dict['GSE'] + "') " +\
+                   "Update [GEO].[dbo].[DeepDiveNotes] set Notes='" + dict['Private'] + "' where GSE='" + dict['GSE'] + "'" +\
+                   "ELSE " +\
+                   "Insert into [GEO].[dbo].[DeepDiveNotes] values('web','"+dict['GSE']+"','"+ dict['Private'] +"')"
+
+    cursor.execute(privateQuery)
     # conn.commit()
     desc = cursor.rowcount
     return desc
