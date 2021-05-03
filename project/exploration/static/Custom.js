@@ -247,6 +247,113 @@ function  BuildTable(columns, rows) {
 
 }
 
+
+ //Modelling
+function SelectAll() {
+    var checkboxes = document.getElementsByClassName('checkitem');
+    for (box of checkboxes){
+        if(box.checked)
+        {
+            box.checked=false
+        }
+        else
+        {
+            box.checked=true
+        }
+    }
+}
+
+function getValues(event) {
+
+            var colname = event.currentTarget.value;
+
+            var select = document.getElementById('Values')
+            // var select = document.getElementById("DropList")
+            var options = select;
+            for (i = options.length-1; i >= 1; i--) {
+              select.removeChild(options[i])
+            }
+
+
+            $.ajax({
+                url: '/dynamic_dropdown',
+                data: {
+                  'col':colname
+                 },
+                dataType: 'json',
+                success: function (response) {
+                       var colvalues = response;
+                       var select = document.getElementById('Values')
+                       for (i=0; i<colvalues.length;i++) {
+                           var option = document.createElement('option')
+                           option.setAttribute('value', colvalues[i])
+                           option.text = colvalues[i]
+                           select.appendChild(option)
+                       }
+
+
+                }
+            });
+
+
+        };
+
+
+
+function model_generate(){
+
+    var target = document.getElementById('target')
+    var out =  target.options[target.selectedIndex].text;
+
+    var unchecked = []
+    var inputs = document.querySelectorAll('.checkitem');
+    for (var i = 0; i < inputs.length; i++) {
+        if (inputs[i].checked == false) {
+                 unchecked.push(inputs[i].value)
+        }
+    }
+    $.ajax({
+        url: '/get_model_params',
+        data: {
+            'y':out,
+            'x' :unchecked
+         },
+        dataType: 'json',
+        success: function (response) {
+               alert('Accuracy = '+response*100 +'%')
+
+        }
+    });
+
+}
+
+function model_generate_reg() {
+
+    var target = document.getElementById('target')
+    var out = target.options[target.selectedIndex].text;
+
+    var unchecked = []
+    var inputs = document.querySelectorAll('.checkitem');
+    for (var i = 0; i < inputs.length; i++) {
+        if (inputs[i].checked == false) {
+            unchecked.push(inputs[i].value)
+        }
+    }
+    $.ajax({
+        url: '/reg_model_params',
+        data: {
+            'y': out,
+            'x': unchecked
+        },
+        dataType: 'json',
+        success: function (response) {
+            alert('MAE =  ' + response[0] + ' RMSE =  ' + response[1] + ' RMSLE = ' + response[2])
+
+        }
+    });
+
+}
+
 function opentrain(event){
     $('#fileToUpload').click();
 }
