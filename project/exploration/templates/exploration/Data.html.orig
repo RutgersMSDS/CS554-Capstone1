@@ -17,10 +17,17 @@
 <body onload="LoadData()" >
 <div class="row" style="background:aliceblue;">
     <ul class="nav nav-tabs">
+<<<<<<< HEAD
+        <li><a href="../Home.html" class="nav-item nav-link"><i class="bx bx-md bxs-home"></i>Home</a></li>
+        <li><a  href="data" class="nav-item nav-link active"><i class="bx bx-md bxs-data"></i>Data</a></li>
+        <li><a data-toggle="page" href="../Exploration.html" class="nav-item nav-link"><i class="bx bx-md bxs-bar-chart-alt-2"></i>Exploration</a></li>
+        <li><a href="../Modelling.html" class="nav-item nav-link"><i class="bx bx-md bx-diamond"></i>Modelling</a></li>
+=======
         <li><a href="" class="nav-item nav-link"><i class="bx bx-md bxs-home"></i>Home</a></li>
         <li><a href="data" class="nav-item nav-link active"><i class="bx bx-md bxs-data"></i>Data</a></li>
         <li><a href="exploration" class="nav-item nav-link"><i class="bx bx-md bxs-bar-chart-alt-2"></i>Exploration</a></li>
         <li><a href="modelling" class="nav-item nav-link"><i class="bx bx-md bx-diamond"></i>Modelling</a></li>
+>>>>>>> modeling
         <li><a href="../Evaluation.html" class="nav-item nav-link"><i class="bx bx-md bxs-wrench"></i>Evaluation</a></li>
         <li><a href="../Deployment.html" class="nav-item nav-link"><i class="bx bx-md bxs-server"></i>Deployment</a></li>
     </ul>
@@ -32,6 +39,19 @@
 </div>
 
 <div id="contextMenu" class="context-menu" style="display: none;margin-left: 1vw;width: 8vw;border: 2px solid;">
+<<<<<<< HEAD
+    <div class='item'>
+        <i onclick="setGSE()"><img src="/static/Images/viewx-16.png" /> View</i>
+    </div>
+    <div class="item">
+        <i id="Targets" onclick="getDatafromDB(event)"><img src="/static/Images/Letter-T-16.png"> Targets</i>
+    </div>
+    <div class="item">
+        <i id="Probes" onclick="getDatafromDB(event)"><img src="/static/Images/Letter-P-violet-16.png"> Probes</i>
+    </div>
+    <div class="item">
+        <i id="Expression" onclick="getDatafromDB(event)"><img src="/static/Images/Letter-E-orange-16.png"> Expression</i>
+=======
     <div class='item' onclick="setGSE()" style="cursor: pointer;">
         <i><img src="/static/Images/viewx-16.png" /> View</i>
     </div>
@@ -43,6 +63,7 @@
     </div>
     <div class="item" id="Expression" onclick="getDatafromDB(event)" style="cursor: pointer;">
         <i><img src="/static/Images/Letter-E-orange-16.png"> Expression</i>
+>>>>>>> modeling
     </div>
 </div>
 
@@ -165,7 +186,11 @@
             <p id="Query" style="margin-left: 0.1vw;margin-top: 0.1vw;height: 5vw;">
                 <textarea id="selectquery" style="width: 70vw;height: 6vw;"></textarea>
                 <img id="runquery" src="/static/Images/Sql-runner-32.png" style="margin-left: 1vw; margin-top: -6vw;" title="Run"></img>
+<<<<<<< HEAD
+{#                <a href="data" class="close" style="margin-top: 0.1vw;margin-right: -1.5vw;"></a>#}
+=======
                 <a href="data" class="close" style="margin-top: 0.1vw;margin-right: -1.5vw;"></a>
+>>>>>>> modeling
 {#                <span class="close" >&times;</span>#}
             </p>
         </div>

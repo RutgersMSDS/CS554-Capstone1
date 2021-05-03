@@ -6,6 +6,10 @@ from django.template import RequestContext
 from exploration import load_fact_table_helper_SQL as ftable
 from exploration import helperPlot as hp
 import pandas as pd
+<<<<<<< HEAD
+
+# response = ftable.gather_all_data()
+=======
 #Modelling imports
 import pandas as pd
 from xgboost import XGBClassifier
@@ -22,6 +26,7 @@ train_set = pd.DataFrame()
 test_set = pd.DataFrame()
 
 train_path =''
+>>>>>>> modeling
 
 # Create your views here.
 def render_Home(request):
@@ -36,7 +41,11 @@ def render_Data(request):
     return render(request, 'exploration/Data.html')
 
 def render_exploration(request):
+<<<<<<< HEAD
+    json_string = json.dumps(response)
+=======
     # json_string = json.dumps(response)
+>>>>>>> modeling
     return render(request, 'exploration/Exploration.html', {"res" : json_string})
 
 def get_plot_data(request):
@@ -64,15 +73,23 @@ def get_plot_data(request):
     return JsonResponse("")
 
 def GetGSEData(request):
+<<<<<<< HEAD
+    dataresponse = ftable.getdata()
+=======
     type = request.GET.get('type', 1)
     dataresponse = ftable.getdata(type)
+>>>>>>> modeling
     return JsonResponse(dataresponse, safe=False)
 
 def DeleteGSE(request):
     gsevalue= request.GET.get('GSE',1)
     # gsevalue=json.load(request)['GSE']
     dbresponse=ftable.DeleteGSE(gsevalue)
+<<<<<<< HEAD
+    return render('data', 'exploration/Data.html')
+=======
     return JsonResponse('success', safe=False)
+>>>>>>> modeling
 
 def SaveGSEData(request):
     dict={}
@@ -120,6 +137,9 @@ def GetDatafromDB(request):
     response.append(datarows)
     response.append(columns)
     response.append(selectquery)
+<<<<<<< HEAD
+    return JsonResponse(response,safe=False)
+=======
     return JsonResponse(response,safe=False)
 
 # MODELLING
@@ -286,3 +306,4 @@ def reg_model_params(request):
     # pred_probs_df.to_csv('REG_XGB_SCORES.csv')
 
     return JsonResponse(results, safe=False)
+>>>>>>> modeling
