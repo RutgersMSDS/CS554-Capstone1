@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bioada</title>
+    <link href="static/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="static/jquery/jquery.min.js"></script>
+    <!-- <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script> -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link href="static/Custom.css" rel="stylesheet">
+    <script src="static/Custom.js"></script>
+
+</head>
+<body onload="LoadData()" >
+<div class="row" style="background:aliceblue;">
+    <ul class="nav nav-tabs">
+        <li><a href="" class="nav-item nav-link"><i class="bx bx-md bxs-home"></i>Home</a></li>
+        <li><a href="data" class="nav-item nav-link active"><i class="bx bx-md bxs-data"></i>Data</a></li>
+        <li><a href="exploration" class="nav-item nav-link"><i class="bx bx-md bxs-bar-chart-alt-2"></i>Exploration</a></li>
+        <li><a href="modelling" class="nav-item nav-link"><i class="bx bx-md bx-diamond"></i>Modelling</a></li>
+        <li><a href="../Evaluation.html" class="nav-item nav-link"><i class="bx bx-md bxs-wrench"></i>Evaluation</a></li>
+        <li><a href="../Deployment.html" class="nav-item nav-link"><i class="bx bx-md bxs-server"></i>Deployment</a></li>
+    </ul>
+</div>
+
+
+<div class="row" id="loadeddata">
+
+</div>
+
+<div id="contextMenu" class="context-menu" style="display: none;margin-left: 1vw;width: 8vw;border: 2px solid;">
+    <div class='item' onclick="setGSE()" style="cursor: pointer;">
+        <i><img src="/static/Images/viewx-16.png" /> View</i>
+    </div>
+    <div class="item" id="Targets" onclick="getDatafromDB(event)" style="cursor: pointer;">
+        <i><img src="/static/Images/Letter-T-16.png"> Targets</i>
+    </div>
+    <div class="item" id="Probes" onclick="getDatafromDB(event)" style="cursor: pointer;">
+        <i><img src="/static/Images/Letter-P-violet-16.png"> Probes</i>
+    </div>
+    <div class="item" id="Expression" onclick="getDatafromDB(event)" style="cursor: pointer;">
+        <i><img src="/static/Images/Letter-E-orange-16.png"> Expression</i>
+    </div>
+</div>
+
+<div class="modal" id="myModal" tabindex="-1" role="dialog" style="display: none;">
+  <div class="modal-dialog" role="document" style="max-width: 100vw;">
+    <div class="modal-content" style="margin-top: -1vw;margin-left: 0.5vw;background-color: #e0e0e0;">
+        <div class="row" style="margin-left: 1.2vw;margin-top: 1vw;">
+                <div class="col-xl-2" >
+                    <label>GSE:</label>
+                    <input style="width: 11vw;" type="text" id="GSE" />
+                </div>
+                <div class="col-xl-2">
+                    <label>Year:</label>
+                    <input style="width: 8vw;" type="text" id="Year"/>
+                </div>
+                <div class="col-xl-3">
+                    <label>Samples:</label>
+                    <INPUT type="text" style="width: 12vw;" id="Samples"/>
+                </div>
+                <div class="col-xl-3">
+                    <label>Assay:</label>
+                    <select style="height:2.5vw;width: 17vw;" id="Assay">
+                        <option>Microarray - RNA</option>
+                        <option>Microarray - microRNA</option>
+                        <option>Microarray - Protein</option>
+                        <option>Microarray - SNP</option>
+                        <option>RNA-Seq</option>
+                        <option>qPCR</option>
+                    </select>
+                </div>
+                <div class="col-xl-2">
+                    <input type="checkbox" name="Active" checked disabled >
+                    <label for="Active">Active</label>
+                    <a href="data" class="close"></a>
+                </div>
+        </div>
+
+        <div class="row" style="margin-top: 1vw;margin-left: 1.2vw;">
+            <div class="col-xl-3">
+                <label>Subject:</label>
+                <INPUT type="text" id="Subject"/>
+            </div>
+            <div class="col-xl-3">
+                <label>Organ:</label>
+                <select id="Organ">
+                    <option>Blood</option>
+                    <option>Brain</option>
+                    <option>Breasts</option>
+                    <option>Female Organs</option>
+                    <option>Heart & Vessels</option>
+                    <option>Infectious diseases</option>
+                    <option>Kidneys</option>
+                    <option>Liver and Gallbladder</option>
+                    <option>Lower GI</option>
+                    <option>Lungs</option>
+                    <option>Lymph glands</option>
+                    <option>Male Organs</option>
+                    <option>Multiple organ</option>
+                    <option>Muscles & Bones</option>
+                    <option>Others</option>
+                    <option>Pancreas</option>
+                    <option>Skin</option>
+                    <option>Thyroid</option>
+                    <option>Upper GI</option>
+                </select>
+            </div>
+            <div class="col-xl-2">
+                <label>Source:</label>
+                <select id="Source">
+                    <option>Blood</option>
+                    <option>Cell Line</option>
+                    <option>Plasma</option>
+                    <option>Serum</option>
+                    <option>Sputum</option>
+                    <option>Tissue</option>
+                    <option>Urine</option>
+                </select>
+            </div>
+            <div class="col-xl-4">
+                <label>Platform:</label>
+                <input type="text" id="Platform"/>
+            </div>
+        </div>
+
+        <div class="row" style="margin-left: 2.1vw;margin-top: 1vw;">
+            <label>Title: </label>
+            <input type="text" style="margin-left: 0.5vw;width: 83vw;" id="Title"/>
+        </div>
+        <div class="row" style="margin-left: 2.1vw;margin-top: 1vw;">
+            <label>URL: </label>
+            <input type="text" style="margin-left: 0.5vw;width: 83vw;" id="URL"/>
+        </div>
+
+        <div class="row" style="margin-left: 2.1vw; margin-top: 1.0vw;">
+            <div class="tab">
+              <button class="tablinks active" onclick="openNotes(event, 'Public')">Public Notes</button>
+              <button class="tablinks" onclick="openNotes(event, 'Private')">Private Notes</button>
+            </div>
+        </div>
+        <div class="row" style="margin-left: 2.1vw;" >
+            <div class="tabcontent" >
+              <textarea style="height:22vw; width: 87vw;display: block;" id="Public"></textarea>
+              <textarea style="height:22vw; width: 87vw;display: none;" id="Private"></textarea>
+            </div>
+        </div>
+
+        <div class="row" style="margin-left: 3vw;margin-top:0.5vw;">
+            <button onclick="deletegse(event)" id="Delete">Delete GSE</button>
+            <button style="margin-left: 60vw;width: 7vw;" onclick="parent.location='data'" id="Cancel">Cancel</button>
+            <button style="margin-left: 2vw;width: 7vw;" onclick="savedata()" id="Apply">Apply</button>
+        </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="DBCont" tabindex="-1" role="dialog" style="display: none;">
+  <div class="modal-dialog modal-dialog-scrollable" role="document" style="max-width: 80vw;">
+    <div class="modal-content" style="margin-top: -1vw;margin-left: 0.5vw;">
+        <div class="modal-header" >
+            <p id="Query" style="margin-left: 0.1vw;margin-top: 0.1vw;height: 5vw;">
+                <textarea id="selectquery" style="width: 70vw;height: 6vw;"></textarea>
+                <img id="runquery" src="/static/Images/Sql-runner-32.png" style="margin-left: 1vw; margin-top: -6vw;" title="Run"></img>
+                <a href="data" class="close" style="margin-top: 0.1vw;margin-right: -1.5vw;"></a>
+{#                <span class="close" >&times;</span>#}
+            </p>
+        </div>
+        <div class="modal-body" id="Database" style="padding: 0px !important;">
+
+        </div>
+    </div>
+  </div>
+</div>
+
+
+</body>
+</html>
