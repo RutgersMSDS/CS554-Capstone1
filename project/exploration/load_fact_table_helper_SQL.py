@@ -4,9 +4,8 @@ from django.http import JsonResponse
 conn= db_con.DBConnection.Instance()
 cursor = conn.cursor
 
-
-def get_datatype(table_name):
-    dataTypeSQL = "SELECT DATA_TYPE, COLUMN_NAME FROM [GSE13355].[INFORMATION_SCHEMA].[COLUMNS] WHERE TABLE_NAME = '" + table_name + "'"
+def get_datatype(databaseName, table_name):
+    dataTypeSQL = "SELECT DATA_TYPE, COLUMN_NAME FROM [" + databaseName + "].[INFORMATION_SCHEMA].[COLUMNS] WHERE TABLE_NAME = '" + table_name + "'"
     cursor.execute(dataTypeSQL)
     data = cursor.fetchall()
     
@@ -22,16 +21,16 @@ def get_datatype(table_name):
     
     return dic
     
-def get_all_probes():
-    probeSQL = "SELECT PID FROM GSE13355.dbo.GSE13355_probes"
+def get_all_probes(databaseName):
+    probeSQL = "SELECT PID FROM " + databaseName + ".dbo." + databaseName + "_probes"
     cursor.execute(probeSQL)
     probes = cursor.fetchall()
     
     probes = [{"name":item[0], "type" : "numerical"} for item in probes]
     return probes
 
-def get_all_tables():
-    tableSQL = "SELECT [name] FROM GSE13355.dbo.sysobjects "
+def get_all_tables(databaseName):
+    tableSQL = "SELECT [name] FROM " + databaseName + ".dbo.sysobjects "
     tableSQL += " WHERE xtype='U' AND [name] LIKE '%fact' AND SUBSTRING([name],1,5)!='slice' ORDER BY 1"
     cursor.execute(tableSQL)
 
@@ -39,9 +38,10 @@ def get_all_tables():
     
     return allTables
 
-def get_all_columns(tableName):
-    type_map = get_datatype(tableName)
-    columnSQL = "SELECT TOP(100) * FROM " + tableName + " WHERE 1=2"
+def get_all_columns(databaseName, tableName):
+    type_map = get_datatype(databaseName, tableName)
+    columnSQL = "SELECT TOP(100) * FROM " + databaseName + ".dbo." + tableName + " WHERE 1=2"
+    
     cursor.execute(columnSQL)
     
     curr = []
@@ -56,14 +56,14 @@ def get_all_columns(tableName):
         
     return curr
 
-def gather_all_data():
+def gather_all_data(databaseName):
     res = {}
 
-    probes = get_all_probes()
-    allTables = get_all_tables()
+    probes = get_all_probes(databaseName)
+    allTables = get_all_tables(databaseName)
     
     for eachTable in allTables:
-        curr = get_all_columns(eachTable[0])
+        curr = get_all_columns(databaseName, eachTable[0])
         
         res[eachTable[0]] = {
             "X" : curr,
@@ -154,6 +154,3 @@ def GetTargets(GSEValue,tablename):
     cursor.execute(columnquery)
     columns= cursor.fetchall()
     return result,columns
-
-
-

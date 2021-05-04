@@ -6,5 +6,5 @@ save_non_project_files = False
 
 [main]
 version = 0.2.0
-recent_files = ['exploration\\views.py', 'exploration\\helperPlot.py', 'exploration\\helperSQL.py', 'exploration\\load_fact_table_helper_SQL.py', 'Bioada\\DBHelper.py']
+recent_files = ['exploration\\views\\views.py', 'exploration\\binningHelper.py', 'exploration\\helperPlot.py', 'exploration\\views.py']
 

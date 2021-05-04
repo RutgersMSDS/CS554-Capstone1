@@ -5,7 +5,7 @@ from django.template import RequestContext
 
 from exploration import load_fact_table_helper_SQL as ftable
 from exploration import helperPlot as hp
-
+from exploration import binningHelper as bh
 #Modeling imports
 import pandas as pd
 from xgboost import XGBClassifier
@@ -18,7 +18,6 @@ mean_squared_error
 
 import math
 
-# response = ftable.gather_all_data()
 # modeling Code
 train_set = pd.DataFrame()
 test_set = pd.DataFrame()
@@ -38,7 +37,12 @@ def render_Data(request):
     return render(request, 'exploration/Data.html')
 
 def render_exploration(request):
-    # json_string = json.dumps(response)
+    databaseName = request.GET.get('gse_value')
+    
+    response = ftable.gather_all_data(databaseName)
+    response["databaseName"] = databaseName
+    json_string = json.dumps(response)
+	
     return render(request, 'exploration/Exploration.html', {"res" : json_string})
 
 def get_plot_data(request):
@@ -46,11 +50,20 @@ def get_plot_data(request):
     incoming_data = json.loads(a.decode('utf-8'))
     
     if(incoming_data["analysis"] == "univariate"):
+        databaseName = incoming_data["databaseName"]
         tableName = incoming_data["tableName"]
         attrType = incoming_data["columns"][0]["columnType"]
         columnName = incoming_data["columns"][0]["columnName"]
+        chartType = incoming_data["chartType"]
         
-        res = hp.get_univariate_data(attrType, columnName, tableName)
+        if(incoming_data["columns"][0]["isBinningRequired"]):
+            binSize = int(incoming_data["columns"][0]["binningSize"])
+            res = bh.get_univariate_binned_data(attrType, columnName, tableName, databaseName, binSize)
+        else:
+            res = hp.get_univariate_data(attrType, columnName, tableName, databaseName, chartType)
+            
+        #" + databaseName + "
+        #databaseName
         return JsonResponse(res)
 
     else:
@@ -60,7 +73,7 @@ def get_plot_data(request):
         attrType_y = incoming_data["columns"][1]["columnType"]
         columnName_y = incoming_data["columns"][1]["columnName"]
         
-        res = hp.get_bivariate_data(attrType_x,attrType_y, columnName_x,columnName_y, tableName)
+        res = hp.get_bivariate_data(attrType_x, attrType_y, columnName_x,columnName_y, tableName)
         return JsonResponse(res)
     
     return JsonResponse("")

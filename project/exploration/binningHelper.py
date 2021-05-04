@@ -31,8 +31,8 @@ def get_matching_tuple(ls, target):
     
     return (ls[x-1], ls[x])
 
-def get_univariate_binned_data(attrType, columnName, tableName, binSize):
-    dataSQL = "SELECT [" + columnName + "] from GSE13355.dbo." + tableName 
+def get_univariate_binned_data(attrType, columnName, tableName, databaseName, binSize):
+    dataSQL = "SELECT [" + columnName + "] from " + databaseName + ".dbo." + tableName 
     cursor.execute(dataSQL)
     
     results = cursor.fetchall()

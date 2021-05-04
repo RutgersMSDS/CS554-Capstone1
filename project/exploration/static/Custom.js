@@ -359,3 +359,17 @@ function settesttext(event) {
     // event.currentTarget.parentElement
 }
 
+function renderExploration(){
+	var form = document.createElement('form');
+	form.method = "GET";
+	form.action = "exploration";
+	form.style.display = "none";
+	
+	var inp = document.createElement("input");
+	inp.value = localStorage['objectToPass'];
+	inp.name = "gse_value";
+	
+	form.appendChild(inp);	
+	document.body.appendChild(form);
+	form.submit();
+}
