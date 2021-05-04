@@ -309,7 +309,36 @@ function model_generate() {
         dataType: 'json',
         success: function (response) {
             alert('Accuracy = ' + response * 100 + '%')
+        },
+        complete:function(){
+            $.ajax({
+                    url: '/evaluation',
+                    type: "GET",
+                    data: {
+                        'mode': 'classification',
+                        'type': 'render',
+                        'csrfmiddlewaretoken': "{{ csrf_token }}"
+                    },
+                    dataType: "json",
+                    success:function(result) {
+                        console.log("Evaluation Success. Rendering HTML")
+                        $("#evaluationData").html(result["Evaluation"])
+                        $("#modelData").hide()
+                        $("#evaluationData").show()
+                        $("#ConfusionMatrix").html(result["ConfusionMatrix"])
+                        $("#StatsTable").html(result["StatisticsTable"])
+                        $("#DecileChart").html(result["DecileTable"])
+                        $("#ConfusionMatrix").show()
+                        $("#StatsTable").show()
+                        $("#DecileChart").show()
 
+                    },
+                    error:function(error) {
+                        console.log("Error" + JSON.stringify(error))
+                        alert("Failed to load evaluation. Please refresh and try again.")
+                    },
+
+                });
         }
     });
 }
@@ -335,7 +364,30 @@ function model_generate_reg() {
         dataType: 'json',
         success: function (response) {
             alert('MAE =  ' + response[0] + ' RMSE =  ' + response[1] + ' RMSLE = ' + response[2])
+        },
+        complete:function(){
+            $.ajax({
+                    url: '/evaluation',
+                    type: "GET",
+                    data: {
+                        'mode': 'regression',
+                        'type': 'render',
+                        'csrfmiddlewaretoken': "{{ csrf_token }}"
+                    },
+                    dataType: "json",
+                    success:function(result) {
+                        console.log("Evaluation Success. Rendering HTML")
+                        $("#evaluationData").html(result["Evaluation"])
+                        $("#modelData").hide()
+                        $("#evaluationData").show()
+                        $("#ConfusionMatrix").html(result["ConfusionMatrix"])
+                    },
+                    error:function(error) {
+                        console.log("Error" + JSON.stringify(error))
+                        alert("Failed to load evaluation. Please refresh and try again.")
+                    },
 
+                });
         }
     });
 
@@ -364,12 +416,12 @@ function renderExploration(){
 	form.method = "GET";
 	form.action = "exploration";
 	form.style.display = "none";
-	
+
 	var inp = document.createElement("input");
 	inp.value = localStorage['objectToPass'];
 	inp.name = "gse_value";
-	
-	form.appendChild(inp);	
+
+	form.appendChild(inp);
 	document.body.appendChild(form);
 	form.submit();
 }
