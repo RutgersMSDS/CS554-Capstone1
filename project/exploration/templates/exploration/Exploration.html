@@ -229,18 +229,57 @@
 							renderAMCharts("univariate_bar", data);
 						}else if(analysisType == "univariate" && type == "pie" && columns[0]["columnType"] == "numerical" && columns[0]["isBinningRequired"]){
 							renderAMCharts("univariate_pie", data);
-						}else if(analysisType == "bivariate" && type == "bar" && (columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "numerical") ){
-							renderAMCharts("bivariate_bar_scatter", data["data"][0]);
-						}else if(analysisType == "bivariate" && type == "pie" && (columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "numerical") ){
-							renderAMCharts("bivariate_pie_box", data["data"][1]);
-						}else if(analysisType == "bivariate" && type == "bar" && (columns[0]["columnType"] == "categorical" && columns[1]["columnType"] == "categorical") ){
-							renderAMCharts("bivariate_bar_segment", data["bar"]);
-						}else if(analysisType == "bivariate" && type == "pie" && (columns[0]["columnType"] == "categorical" && columns[1]["columnType"] == "categorical") ){
-							renderAMCharts("bivariate_pie_segment", data["pie"]);
-						}else if(analysisType == "bivariate" && type == "bar" && ((columns[0]["columnType"] == "categorical" && columns[1]["columnType"] == "numerical")||(columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "categorical")) ){
-							renderAMCharts("bivariate_bar_pareto", data["bar"]);
-						}else if(analysisType == "bivariate" && type == "pie" && ((columns[0]["columnType"] == "categorical" && columns[1]["columnType"] == "numerical")||(columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "categorical")) ){
-							renderAMCharts("bivariate_pie_interval", data["pie"]);
+						}else if(columns[0]["isBinningRequired"] || columns[1]["isBinningRequired"])
+						{
+						console.log("REached2");
+							if(columns[0]["isBinningRequired"] && columns[1]["isBinningRequired"])
+							{
+								if(analysisType == "bivariate" && type == "bar" && (columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "numerical") ){
+									renderAMCharts("bivariate_bar_segment", data["bar"]);
+									console.log("REached1");
+								}else if(analysisType == "bivariate" && type == "pie" && (columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "numerical") ){
+									renderAMCharts("bivariate_pie_segment", data["pie"]);
+								}
+							}
+							else if(columns[0]["isBinningRequired"] )
+							{
+								if(analysisType == "bivariate" && type == "bar" && (columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "categorical") ){
+									renderAMCharts("bivariate_bar_segment", data["bar"]);
+								}else if(analysisType == "bivariate" && type == "pie" && (columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "categorical") ){
+									renderAMCharts("bivariate_pie_segment", data["pie"]);
+								}else if(analysisType == "bivariate" && type == "bar" && (columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "numerical") ){
+									renderAMCharts("bivariate_bar_pareto", data["bar"]);
+								}else if(analysisType == "bivariate" && type == "pie" && (columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "numerical") ){
+									renderAMCharts("bivariate_pie_interval", data["pie"]);
+								}
+							}
+							else if(columns[1]["isBinningRequired"] )
+							{
+								if(analysisType == "bivariate" && type == "bar" && (columns[0]["columnType"] == "categorical" && columns[1]["columnType"] == "numerical")){
+									renderAMCharts("bivariate_bar_segment", data["bar"]);
+								}else if(analysisType == "bivariate" && type == "pie" && (columns[0]["columnType"] == "categorical" && columns[1]["columnType"] == "numerical") ){
+									renderAMCharts("bivariate_pie_segment", data["pie"]);
+								}else if(analysisType == "bivariate" && type == "bar" && (columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "numerical") ){
+									renderAMCharts("bivariate_bar_pareto", data["bar"]);
+								}else if(analysisType == "bivariate" && type == "pie" && (columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "numerical") ){
+									renderAMCharts("bivariate_pie_interval", data["pie"]);
+								}
+							}
+						}
+						else{
+							if(analysisType == "bivariate" && type == "bar" && (columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "numerical") ){
+								renderAMCharts("bivariate_bar_scatter", data["data"][0]);
+							}else if(analysisType == "bivariate" && type == "pie" && (columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "numerical") ){
+								renderAMCharts("bivariate_pie_box", data["data"][1]);
+							}else if(analysisType == "bivariate" && type == "bar" && (columns[0]["columnType"] == "categorical" && columns[1]["columnType"] == "categorical") ){
+								renderAMCharts("bivariate_bar_segment", data["bar"]);
+							}else if(analysisType == "bivariate" && type == "pie" && (columns[0]["columnType"] == "categorical" && columns[1]["columnType"] == "categorical") ){
+								renderAMCharts("bivariate_pie_segment", data["pie"]);
+							}else if(analysisType == "bivariate" && type == "bar" && ((columns[0]["columnType"] == "categorical" && columns[1]["columnType"] == "numerical")||(columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "categorical")) ){
+								renderAMCharts("bivariate_bar_pareto", data["bar"]);
+							}else if(analysisType == "bivariate" && type == "pie" && ((columns[0]["columnType"] == "categorical" && columns[1]["columnType"] == "numerical")||(columns[0]["columnType"] == "numerical" && columns[1]["columnType"] == "categorical")) ){
+								renderAMCharts("bivariate_pie_interval", data["pie"]);
+							}
 						}
 						
 						displayStatTable(analysisType, data, columns);

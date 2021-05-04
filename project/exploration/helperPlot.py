@@ -89,7 +89,7 @@ def get_univariate_data(attrType, columnName, tableName, databaseName, chartType
 
     return data
 	
-def get_bivariate_data(attrType_x, attrType_y, columnName_x, columnName_y, tableName):
+def get_bivariate_data(attrType_x, attrType_y, columnName_x, columnName_y, databaseName,tableName):
     dataSQL = ""
     
     data={}
@@ -102,7 +102,7 @@ def get_bivariate_data(attrType_x, attrType_y, columnName_x, columnName_y, table
             
         dataSQL="Select "+columnName_x+", Sum(cast(["+columnName_y+"] As float)) As SumX, "
         dataSQL+="Sum(cast(["+columnName_y+"] As float)*cast(["+columnName_y+"] As float)) As SumX2,"
-        dataSQL+="Count(*) As frq  FROM GSE13355.dbo."+tableName
+        dataSQL+="Count(*) As frq  FROM " + databaseName + ".dbo."+tableName
         dataSQL+=" WHERE  1=1  And ["+ columnName_y +"] Is Not null GROUP BY ["+ columnName_x +"] ORDER BY 1 "
         
         cursor.execute(dataSQL)
@@ -167,7 +167,7 @@ def get_bivariate_data(attrType_x, attrType_y, columnName_x, columnName_y, table
         
         dataSQL="SELECT TOP 100  cast(["+columnName_x+"] as float) AS ["+columnName_x+"],"
         dataSQL+="cast(["+columnName_y+"] as float) AS ["+columnName_y+"]"
-        dataSQL+=" FROM GSE13355.dbo."+tableName+" WHERE  1=1  AND ["+columnName_x+"] is not null AND ["+columnName_y+"] is not null"
+        dataSQL+=" FROM " + databaseName + ".dbo."+tableName+" WHERE  1=1  AND ["+columnName_x+"] is not null AND ["+columnName_y+"] is not null"
 
         cursor.execute(dataSQL)
         results = cursor.fetchall()
@@ -228,7 +228,7 @@ def get_bivariate_data(attrType_x, attrType_y, columnName_x, columnName_y, table
         return data
     else:
         dataSQL="SELECT ["+columnName_x+"],["+columnName_y+"], Count(*) as Frq "
-        dataSQL+="FROM GSE13355.dbo."+tableName+" WHERE  1=1  GROUP BY ["+columnName_x+"],["+columnName_y+"] ORDER BY ["+columnName_x+"],["+columnName_y+"]"
+        dataSQL+="FROM " + databaseName + ".dbo."+tableName+" WHERE  1=1  GROUP BY ["+columnName_x+"],["+columnName_y+"] ORDER BY ["+columnName_x+"],["+columnName_y+"]"
         
         cursor.execute(dataSQL)
         results = cursor.fetchall()
