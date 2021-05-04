@@ -1,0 +1,108 @@
+#classification_nav {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: center;
+}
+
+#regression_nav{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: center;
+}
+
+.nav-item.eval.active{
+    background: #428bca;
+    border: #428bca;
+    width: 150px;
+    margin-left: 10px;
+    margin-right: 10px;
+    text-align: center;
+    border-style: solid;
+    border-width: 1px;
+}
+
+.nav-item.eval{
+    border: #428bcac7;
+    background: #eff8fe;
+    border-style: solid;
+    border-width: 1px;
+    width: 150px;
+    margin-left: 10px;
+    margin-right: 10px;
+    text-align: center;
+}
+
+.nav-item.eval.active button{
+    background: none;
+    border: none;
+    width: 150px;
+    text-align: center;
+    color: white;
+    height: 40px;
+}
+
+.nav-item.eval button{
+    border: none;
+    background: none;
+    width: 150px;
+    text-align: center;
+    height: 40px;
+}
+
+#classification_nav .bg-light {
+  background-color: #dadada !important;
+}
+
+#ConfusionMatrix {
+    justify-content: center;
+    margin-top: 10px;
+    align-items: center;
+    display: flex;
+}
+#StatsTable{
+    justify-content: center;
+    margin-top: 20px;
+    align-items: center;
+    display: flex;
+}
+
+#StatsTable table{
+    width: 600px;
+    border-width: 2px;
+}
+
+#DecileChart{
+    justify-content: center;
+    margin-top: 20px;
+    align-items: center;
+    display: flex;
+}
+
+#DecileChart table{
+    width: 600px;
+    border-width: 2px;
+}
+
+#ConfusionMatrix table {
+    justify-content: center;
+    border-collapse: collapse;
+    border-width: 2px !important;
+}
+
+#ConfusionMatrix table th{
+    justify-content: center;
+    width: 150px;
+}
+
+#ConfusionMatrix table td{
+    justify-content: center;
+    width: 150px;
+}
+
+#ConfusionMatrix table, td, th {
+  border: 1px solid black;
+}
